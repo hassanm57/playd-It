@@ -1,0 +1,187 @@
+from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy.orm import Session
+from sqlalchemy import func
+from typing import Optional
+import httpx
+from datetime import datetime, timezone
+
+from app.database import get_db
+from app.config import settings
+from app.models import Game, Rating, Review, Favorite, User
+from app.schemas import GameDetail, GameStats, GameSearchResult, UserGameStatus, ReviewResponse, UserPublic
+from app.auth import get_current_user
+
+router = APIRouter(prefix="/api/games", tags=["games"])
+
+
+async def fetch_rawg_search(query: str, page: int = 1, page_size: int = 10):
+    """Search RAWG API for games."""
+    async with httpx.AsyncClient() as client:
+        response = await client.get(
+            f"{settings.RAWG_BASE_URL}/games",
+            params={
+                "key": settings.RAWG_API_KEY,
+                "search": query,
+                "page": page,
+                "page_size": page_size,
+                "search_precise": True,
+            },
+            timeout=10.0,
+        )
+        response.raise_for_status()
+        return response.json()
+
+
+async def fetch_rawg_game(rawg_id: int):
+    """Fetch a single game from RAWG by ID."""
+    async with httpx.AsyncClient() as client:
+        response = await client.get(
+            f"{settings.RAWG_BASE_URL}/games/{rawg_id}",
+            params={"key": settings.RAWG_API_KEY},
+            timeout=10.0,
+        )
+        response.raise_for_status()
+        return response.json()
+
+
+def rawg_to_game(data: dict) -> dict:
+    """Convert RAWG API response to our Game model fields."""
+    developers = data.get("developers", [])
+    publishers = data.get("publishers", [])
+    platforms = []
+    for p in data.get("platforms", []) or []:
+        plat = p.get("platform", {})
+        if plat.get("name"):
+            platforms.append(plat["name"])
+    genres = [g["name"] for g in (data.get("genres", []) or [])]
+
+    return {
+        "rawg_id": data["id"],
+        "title": data.get("name", ""),
+        "slug": data.get("slug", ""),
+        "description": data.get("description_raw", data.get("description", "")),
+        "cover_url": data.get("background_image", None),
+        "background_url": data.get("background_image_additional", data.get("background_image", None)),
+        "release_date": data.get("released", None),
+        "developer": developers[0]["name"] if developers else "",
+        "publisher": publishers[0]["name"] if publishers else "",
+        "platforms": platforms,
+        "genres": genres,
+        "cached_at": datetime.now(timezone.utc),
+    }
+
+
+def get_or_cache_game(db: Session, rawg_id: int, rawg_data: dict = None) -> Game:
+    """Get game from DB cache, or create from RAWG data."""
+    game = db.query(Game).filter(Game.rawg_id == rawg_id).first()
+    if game:
+        return game
+    if rawg_data is None:
+        return None
+    fields = rawg_to_game(rawg_data)
+    game = Game(**fields)
+    db.add(game)
+    db.commit()
+    db.refresh(game)
+    return game
+
+
+@router.get("/search", response_model=list[GameSearchResult])
+async def search_games(q: str = Query(min_length=1, max_length=200)):
+    """Search for games via RAWG API."""
+    try:
+        data = await fetch_rawg_search(q, page_size=12)
+    except Exception:
+        raise HTTPException(status_code=502, detail="Failed to search games")
+
+    results = []
+    for game in data.get("results", []):
+        platforms = []
+        for p in game.get("platforms", []) or []:
+            plat = p.get("platform", {})
+            if plat.get("name"):
+                platforms.append(plat["name"])
+        results.append(GameSearchResult(
+            rawg_id=game["id"],
+            title=game.get("name", ""),
+            slug=game.get("slug", ""),
+            cover_url=game.get("background_image", None),
+            release_date=game.get("released", None),
+            platforms=platforms,
+        ))
+    return results
+
+
+@router.get("/{rawg_id}", response_model=GameDetail)
+async def get_game(rawg_id: int, db: Session = Depends(get_db)):
+    """Get game detail. Fetches from RAWG if not cached."""
+    game = db.query(Game).filter(Game.rawg_id == rawg_id).first()
+    if game:
+        return game
+
+    # Fetch from RAWG and cache
+    try:
+        data = await fetch_rawg_game(rawg_id)
+    except Exception:
+        raise HTTPException(status_code=404, detail="Game not found")
+
+    game = get_or_cache_game(db, rawg_id, data)
+    return game
+
+
+@router.get("/{rawg_id}/stats", response_model=GameStats)
+def get_game_stats(rawg_id: int, db: Session = Depends(get_db)):
+    """Get community stats for a game."""
+    game = db.query(Game).filter(Game.rawg_id == rawg_id).first()
+    if not game:
+        return GameStats()
+
+    avg = db.query(func.avg(Rating.rating)).filter(Rating.game_id == game.id).scalar()
+    total_ratings = db.query(func.count(Rating.id)).filter(Rating.game_id == game.id).scalar()
+    total_reviews = db.query(func.count(Review.id)).filter(Review.game_id == game.id).scalar()
+    total_favorites = db.query(func.count(Favorite.id)).filter(Favorite.game_id == game.id).scalar()
+
+    return GameStats(
+        avg_rating=round(avg, 2) if avg else None,
+        total_ratings=total_ratings or 0,
+        total_reviews=total_reviews or 0,
+        total_favorites=total_favorites or 0,
+    )
+
+
+@router.get("/{rawg_id}/status", response_model=UserGameStatus)
+def get_user_game_status(
+    rawg_id: int,
+    db: Session = Depends(get_db),
+    user: Optional[User] = Depends(get_current_user),
+):
+    """Get the current user's rating, favorite, and review for a game."""
+    if not user:
+        return UserGameStatus()
+
+    game = db.query(Game).filter(Game.rawg_id == rawg_id).first()
+    if not game:
+        return UserGameStatus()
+
+    rating_obj = db.query(Rating).filter(Rating.user_id == user.id, Rating.game_id == game.id).first()
+    fav = db.query(Favorite).filter(Favorite.user_id == user.id, Favorite.game_id == game.id).first()
+    review = db.query(Review).filter(Review.user_id == user.id, Review.game_id == game.id).first()
+
+    review_resp = None
+    if review:
+        review_resp = ReviewResponse(
+            id=review.id,
+            user_id=review.user_id,
+            game_id=review.game_id,
+            body=review.body,
+            contains_spoilers=review.contains_spoilers,
+            created_at=review.created_at,
+            updated_at=review.updated_at,
+            user=UserPublic.model_validate(user),
+        )
+
+    return UserGameStatus(
+        rating=rating_obj.rating if rating_obj else None,
+        is_favorite=fav is not None,
+        review=review_resp,
+    )
