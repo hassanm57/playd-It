@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { User as UserIcon } from 'lucide-react';
+import { useParams, Link } from 'react-router-dom';
+import { User as UserIcon, Star, Heart, MessageSquare, Calendar, Gamepad2 } from 'lucide-react';
 import GameCard from '../components/GameCard';
-import StarRating from '../components/StarRating';
 import ReviewCard from '../components/ReviewCard';
 import { usersAPI } from '../lib/api';
 import type { UserProfile as UserProfileType, UserRating, UserFavorite, Review } from '../types';
@@ -16,7 +15,7 @@ export default function Profile() {
   const [favorites, setFavorites] = useState<UserFavorite[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState<'overview' | 'ratings' | 'reviews' | 'favorites'>('overview');
+  const [tab, setTab] = useState<'overview' | 'ratings' | 'favorites' | 'reviews'>('overview');
 
   useEffect(() => {
     setLoading(true);
@@ -38,11 +37,11 @@ export default function Profile() {
 
   if (loading) {
     return (
-      <div className="max-w-5xl mx-auto px-4 py-10">
-        <div className="flex flex-col items-center gap-4 mb-10">
-          <div className="w-20 h-20 rounded-full skeleton" />
-          <div className="h-6 w-32 skeleton rounded" />
-          <div className="h-4 w-48 skeleton rounded" />
+      <div className="max-w-6xl mx-auto px-4 py-16">
+        <div className="flex flex-col items-center gap-4 mb-12">
+          <div className="w-24 h-24 rounded-full apple-skeleton" />
+          <div className="h-6 w-36 apple-skeleton rounded-lg" />
+          <div className="h-4 w-52 apple-skeleton rounded-md" />
         </div>
       </div>
     );
@@ -50,179 +49,309 @@ export default function Profile() {
 
   if (!profile) {
     return (
-      <div className="max-w-5xl mx-auto px-4 py-20 text-center">
-        <p className="text-text-muted">User not found</p>
+      <div className="max-w-4xl mx-auto px-4 py-24 text-center">
+        <h2 className="text-2xl font-bold text-white mb-2">Member Not Found</h2>
+        <p className="text-sm text-white/50 mb-6">No user exists with the handle @{cleanUsername}.</p>
+        <Link
+          to="/"
+          className="px-5 py-2.5 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-semibold tracking-wide transition-all"
+        >
+          Return Home
+        </Link>
       </div>
     );
   }
 
+  const joinYear = new Date(profile.created_at).getFullYear();
+
   return (
-    <div className="max-w-5xl mx-auto px-4 py-10">
-      {/* Profile header */}
-      <div className="flex flex-col items-center mb-10">
-        <div className="w-20 h-20 rounded-full bg-bg-card border-2 border-border flex items-center justify-center overflow-hidden mb-4">
-          {profile.avatar_url ? (
-            <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
-          ) : (
-            <UserIcon className="w-8 h-8 text-text-muted" />
-          )}
-        </div>
-        <h1 className="text-xl font-bold mb-1">{profile.username}</h1>
-        <p className="text-sm text-text-secondary mb-3">@{profile.username}</p>
-        {profile.bio && (
-          <p className="text-sm text-text-muted text-center max-w-md mb-3">{profile.bio}</p>
-        )}
-        <div className="flex items-center gap-6 text-sm">
-          <div className="text-center">
-            <span className="font-semibold text-text-primary">{profile.games_rated}</span>
-            <span className="text-text-muted ml-1">games</span>
+    <div className="min-h-screen pb-24">
+      {/* ========================================================= */}
+      {/* 1. CINEMATIC PROFILE BANNER & HEADER                      */}
+      {/* ========================================================= */}
+      <section className="relative w-full pt-12 pb-10 overflow-hidden border-b border-white/[0.06]">
+        {/* Ambient Top Glow */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-56 bg-gradient-to-b from-[#E50914]/15 via-transparent to-transparent blur-3xl pointer-events-none -z-0" />
+
+        <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 flex flex-col items-center text-center">
+          {/* Avatar with Specular Ring */}
+          <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-[#15161F] p-1 border-2 border-white/20 shadow-[0_12px_40px_rgba(0,0,0,0.8)] mb-4 group">
+            <div className="w-full h-full rounded-full overflow-hidden bg-[#181922] flex items-center justify-center">
+              {profile.avatar_url ? (
+                <img
+                  src={profile.avatar_url}
+                  alt={profile.username}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <UserIcon className="w-10 h-10 text-white/40" />
+              )}
+            </div>
           </div>
-          {profile.avg_rating && (
+
+          {/* Username & Handle */}
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight mb-1">
+            {profile.username}
+          </h1>
+          <p className="text-xs font-medium text-white/40 mb-3 flex items-center gap-2">
+            <span>@{profile.username}</span>
+            <span>·</span>
+            <span className="flex items-center gap-1">
+              <Calendar className="w-3 h-3" /> Member since {joinYear}
+            </span>
+          </p>
+
+          {/* Bio */}
+          {profile.bio && (
+            <p className="text-sm text-white/70 max-w-lg mb-6 leading-relaxed font-normal">
+              {profile.bio}
+            </p>
+          )}
+
+          {/* Apple TV Stats Ribbon */}
+          <div className="flex items-center gap-4 sm:gap-8 px-6 py-3 rounded-2xl apple-glass border border-white/10 shadow-lg">
             <div className="text-center">
-              <span className="font-semibold text-text-primary">{profile.avg_rating.toFixed(1)}</span>
-              <span className="text-text-muted ml-1">avg</span>
+              <span className="block text-lg sm:text-xl font-extrabold text-white">
+                {profile.games_rated}
+              </span>
+              <span className="text-[11px] font-semibold text-white/40 uppercase tracking-wider">
+                Logged
+              </span>
             </div>
-          )}
-        </div>
-      </div>
 
-      {/* Tabs */}
-      <div className="flex gap-6 border-b border-border mb-8">
-        {(['overview', 'ratings', 'reviews', 'favorites'] as const).map((t) => (
-          <button
-            key={t}
-            onClick={() => setTab(t)}
-            className={`pb-3 text-sm font-medium transition-colors border-b-2 ${
-              tab === t
-                ? 'border-accent text-text-primary'
-                : 'border-transparent text-text-muted hover:text-text-secondary'
-            }`}
-          >
-            {t.charAt(0).toUpperCase() + t.slice(1)}
-          </button>
-        ))}
-      </div>
+            <div className="h-6 w-px bg-white/10" />
 
-      {/* Tab content */}
-      {tab === 'overview' && (
-        <>
-          {/* Favorites */}
-          {favorites.length > 0 && (
-            <div className="mb-10">
-              <h2 className="text-sm font-medium text-text-muted uppercase tracking-wider mb-4">
+            <div className="text-center">
+              <span className="block text-lg sm:text-xl font-extrabold text-white flex items-center justify-center gap-1">
+                <Star className="w-3.5 h-3.5 text-[#E50914] fill-[#E50914]" />
+                {profile.avg_rating ? profile.avg_rating.toFixed(1) : '—'}
+              </span>
+              <span className="text-[11px] font-semibold text-white/40 uppercase tracking-wider">
+                Avg Rating
+              </span>
+            </div>
+
+            <div className="h-6 w-px bg-white/10" />
+
+            <div className="text-center">
+              <span className="block text-lg sm:text-xl font-extrabold text-[#E50914]">
+                {favorites.length}
+              </span>
+              <span className="text-[11px] font-semibold text-white/40 uppercase tracking-wider">
                 Favorites
-              </h2>
-              <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3">
-                {favorites.slice(0, 6).map((fav) => (
-                  <GameCard
-                    key={fav.game.rawg_id}
-                    rawgId={fav.game.rawg_id}
-                    title={fav.game.title}
-                    slug={fav.game.slug}
-                    coverUrl={fav.game.cover_url}
-                  />
-                ))}
-              </div>
+              </span>
             </div>
-          )}
 
-          {/* Recent ratings */}
-          {ratings.length > 0 && (
-            <div className="mb-10">
-              <h2 className="text-sm font-medium text-text-muted uppercase tracking-wider mb-4">
-                Recent Ratings
-              </h2>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
-                {ratings.slice(0, 12).map((item) => (
-                  <GameCard
-                    key={item.game.rawg_id}
-                    rawgId={item.game.rawg_id}
-                    title={item.game.title}
-                    slug={item.game.slug}
-                    coverUrl={item.game.cover_url}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
+            <div className="h-6 w-px bg-white/10" />
 
-          {/* Recent reviews */}
-          {reviews.length > 0 && (
-            <div>
-              <h2 className="text-sm font-medium text-text-muted uppercase tracking-wider mb-4">
+            <div className="text-center">
+              <span className="block text-lg sm:text-xl font-extrabold text-white">
+                {reviews.length}
+              </span>
+              <span className="text-[11px] font-semibold text-white/40 uppercase tracking-wider">
                 Reviews
-              </h2>
-              <div className="space-y-3">
-                {reviews.slice(0, 5).map((review) => (
-                  <ReviewCard key={review.id} review={review} />
-                ))}
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ========================================================= */}
+      {/* 2. TABS & CONTENT                                         */}
+      {/* ========================================================= */}
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 pt-8">
+        {/* Apple TV Nav Pills */}
+        <div className="flex items-center justify-center gap-2 mb-10 overflow-x-auto no-scrollbar py-1">
+          {(['overview', 'ratings', 'favorites', 'reviews'] as const).map((t) => (
+            <button
+              key={t}
+              onClick={() => setTab(t)}
+              className={`px-5 py-2 rounded-full text-xs font-semibold tracking-wide transition-all select-none ${
+                tab === t
+                  ? 'bg-white text-black shadow-md scale-105'
+                  : 'text-white/60 hover:text-white hover:bg-white/[0.08]'
+              }`}
+            >
+              {t === 'overview'
+                ? 'Overview'
+                : t === 'ratings'
+                  ? `Ratings (${ratings.length})`
+                  : t === 'favorites'
+                    ? `Favorites (${favorites.length})`
+                    : `Reviews (${reviews.length})`}
+            </button>
+          ))}
+        </div>
+
+        {/* TAB 1: OVERVIEW */}
+        {tab === 'overview' && (
+          <div className="space-y-12">
+            {/* Pinned Top Favorites */}
+            {favorites.length > 0 && (
+              <section>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-bold tracking-tight text-white flex items-center gap-2">
+                    <Heart className="w-4 h-4 text-[#E50914] fill-[#E50914]" />
+                    <span>Favorite Games</span>
+                  </h2>
+                  <button
+                    onClick={() => setTab('favorites')}
+                    className="text-xs font-semibold text-white/40 hover:text-white transition-colors"
+                  >
+                    View All ({favorites.length})
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-5">
+                  {favorites.slice(0, 6).map((fav) => (
+                    <GameCard
+                      key={fav.game.rawg_id}
+                      rawgId={fav.game.rawg_id}
+                      title={fav.game.title}
+                      coverUrl={fav.game.cover_url}
+                      releaseDate={fav.game.release_date}
+                      platforms={fav.game.platforms}
+                    />
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* Recent Ratings Diary */}
+            {ratings.length > 0 && (
+              <section>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-bold tracking-tight text-white flex items-center gap-2">
+                    <Star className="w-4 h-4 text-[#E50914] fill-[#E50914]" />
+                    <span>Recent Activity</span>
+                  </h2>
+                  <button
+                    onClick={() => setTab('ratings')}
+                    className="text-xs font-semibold text-white/40 hover:text-white transition-colors"
+                  >
+                    View All ({ratings.length})
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-5">
+                  {ratings.slice(0, 12).map((item) => (
+                    <GameCard
+                      key={item.game.rawg_id}
+                      rawgId={item.game.rawg_id}
+                      title={item.game.title}
+                      coverUrl={item.game.cover_url}
+                      releaseDate={item.game.release_date}
+                      platforms={item.game.platforms}
+                      rating={item.rating}
+                    />
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* Recent Reviews */}
+            {reviews.length > 0 && (
+              <section>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-bold tracking-tight text-white flex items-center gap-2">
+                    <MessageSquare className="w-4 h-4 text-white/60" />
+                    <span>Recent Reviews</span>
+                  </h2>
+                  <button
+                    onClick={() => setTab('reviews')}
+                    className="text-xs font-semibold text-white/40 hover:text-white transition-colors"
+                  >
+                    View All ({reviews.length})
+                  </button>
+                </div>
+
+                <div className="space-y-3">
+                  {reviews.slice(0, 4).map((review) => (
+                    <ReviewCard key={review.id} review={review} />
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {ratings.length === 0 && favorites.length === 0 && (
+              <div className="text-center py-20 p-8 rounded-3xl apple-glass border border-white/[0.08]">
+                <Gamepad2 className="w-12 h-12 text-white/20 mx-auto mb-3" />
+                <h3 className="text-base font-bold text-white mb-1">No Activity Yet</h3>
+                <p className="text-xs text-white/40 max-w-sm mx-auto mb-5">
+                  {cleanUsername} hasn't rated or logged any games on PLAYD yet.
+                </p>
+                <Link
+                  to="/"
+                  className="px-5 py-2.5 rounded-full bg-white text-black text-xs font-semibold tracking-wide hover:bg-white/90 transition-all inline-block"
+                >
+                  Search Games to Log
+                </Link>
               </div>
-            </div>
-          )}
+            )}
+          </div>
+        )}
 
-          {ratings.length === 0 && favorites.length === 0 && (
-            <div className="text-center py-16">
-              <p className="text-text-muted">No activity yet.</p>
+        {/* TAB 2: RATINGS */}
+        {tab === 'ratings' && (
+          <div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-5">
+              {ratings.map((item) => (
+                <GameCard
+                  key={item.game.rawg_id}
+                  rawgId={item.game.rawg_id}
+                  title={item.game.title}
+                  coverUrl={item.game.cover_url}
+                  releaseDate={item.game.release_date}
+                  platforms={item.game.platforms}
+                  rating={item.rating}
+                />
+              ))}
             </div>
-          )}
-        </>
-      )}
-
-      {tab === 'ratings' && (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-          {ratings.map((item) => (
-            <div key={item.game.rawg_id}>
-              <GameCard
-                rawgId={item.game.rawg_id}
-                title={item.game.title}
-                slug={item.game.slug}
-                coverUrl={item.game.cover_url}
-              />
-              <div className="mt-1">
-                <StarRating value={item.rating} readonly size={14} />
+            {ratings.length === 0 && (
+              <div className="text-center py-20 text-white/40 text-sm">
+                No ratings logged yet.
               </div>
-            </div>
-          ))}
-          {ratings.length === 0 && (
-            <div className="col-span-full text-center py-16">
-              <p className="text-text-muted">No ratings yet.</p>
-            </div>
-          )}
-        </div>
-      )}
+            )}
+          </div>
+        )}
 
-      {tab === 'reviews' && (
-        <div className="space-y-3">
-          {reviews.map((review) => (
-            <ReviewCard key={review.id} review={review} />
-          ))}
-          {reviews.length === 0 && (
-            <div className="text-center py-16">
-              <p className="text-text-muted">No reviews yet.</p>
+        {/* TAB 3: FAVORITES */}
+        {tab === 'favorites' && (
+          <div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-5">
+              {favorites.map((fav) => (
+                <GameCard
+                  key={fav.game.rawg_id}
+                  rawgId={fav.game.rawg_id}
+                  title={fav.game.title}
+                  coverUrl={fav.game.cover_url}
+                  releaseDate={fav.game.release_date}
+                  platforms={fav.game.platforms}
+                />
+              ))}
             </div>
-          )}
-        </div>
-      )}
+            {favorites.length === 0 && (
+              <div className="text-center py-20 text-white/40 text-sm">
+                No favorite games added yet.
+              </div>
+            )}
+          </div>
+        )}
 
-      {tab === 'favorites' && (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-          {favorites.map((fav) => (
-            <div key={fav.game.rawg_id}>
-              <GameCard
-                rawgId={fav.game.rawg_id}
-                title={fav.game.title}
-                slug={fav.game.slug}
-                coverUrl={fav.game.cover_url}
-              />
-            </div>
-          ))}
-          {favorites.length === 0 && (
-            <div className="col-span-full text-center py-16">
-              <p className="text-text-muted">No favorites yet.</p>
-            </div>
-          )}
-        </div>
-      )}
+        {/* TAB 4: REVIEWS */}
+        {tab === 'reviews' && (
+          <div className="max-w-3xl mx-auto space-y-4">
+            {reviews.map((review) => (
+              <ReviewCard key={review.id} review={review} />
+            ))}
+            {reviews.length === 0 && (
+              <div className="text-center py-20 text-white/40 text-sm">
+                No reviews written yet.
+              </div>
+            )}
+          </div>
+        )}
+      </main>
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import { Heart, Gamepad2, AlertCircle, MessageSquarePlus, Trash2, Edit3 } from 'lucide-react';
 import StarRating from '../components/StarRating';
 import LoveButton from '../components/LoveButton';
 import ReviewCard from '../components/ReviewCard';
@@ -24,7 +25,7 @@ export default function GameDetail({ user }: GameDetailProps) {
   // Review form state
   const [reviewText, setReviewText] = useState('');
   const [spoilers, setSpoilers] = useState(false);
-  const [editingReview, setEditingReview] = useState(false);
+  const [isEditingReview, setIsEditingReview] = useState(false);
   const [submittingReview, setSubmittingReview] = useState(false);
 
   const fetchData = useCallback(async () => {
@@ -48,7 +49,7 @@ export default function GameDetail({ user }: GameDetailProps) {
         }
       }
     } catch {
-      // handle error
+      // Game not found or error
     } finally {
       setLoading(false);
     }
@@ -69,7 +70,6 @@ export default function GameDetail({ user }: GameDetailProps) {
       } else {
         await ratingsAPI.rate(id, rating);
       }
-      // Refresh status and stats
       const [statusRes, statsRes] = await Promise.all([
         gamesAPI.getStatus(id),
         gamesAPI.getStats(id),
@@ -86,8 +86,12 @@ export default function GameDetail({ user }: GameDetailProps) {
     }
     try {
       await favoritesAPI.toggle(id);
-      const statusRes = await gamesAPI.getStatus(id);
+      const [statusRes, statsRes] = await Promise.all([
+        gamesAPI.getStatus(id),
+        gamesAPI.getStats(id),
+      ]);
       setStatus(statusRes.data);
+      setStats(statsRes.data);
     } catch {}
   };
 
@@ -97,16 +101,16 @@ export default function GameDetail({ user }: GameDetailProps) {
     try {
       if (status?.review) {
         await reviewsAPI.update(status.review.id, {
-          body: reviewText,
+          body: reviewText.trim(),
           contains_spoilers: spoilers,
         });
       } else {
         await reviewsAPI.create(id, {
-          body: reviewText,
+          body: reviewText.trim(),
           contains_spoilers: spoilers,
         });
       }
-      setEditingReview(false);
+      setIsEditingReview(false);
       await fetchData();
     } catch {}
     setSubmittingReview(false);
@@ -118,19 +122,20 @@ export default function GameDetail({ user }: GameDetailProps) {
       await reviewsAPI.delete(status.review.id);
       setReviewText('');
       setSpoilers(false);
+      setIsEditingReview(false);
       await fetchData();
     } catch {}
   };
 
   if (loading) {
     return (
-      <div className="max-w-5xl mx-auto px-4 py-10">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12">
         <div className="flex flex-col md:flex-row gap-8">
-          <div className="w-64 h-80 skeleton rounded-xl flex-shrink-0" />
+          <div className="w-56 sm:w-64 aspect-[2/3] apple-skeleton rounded-2xl flex-shrink-0 mx-auto md:mx-0" />
           <div className="flex-1 space-y-4">
-            <div className="h-8 w-3/4 skeleton rounded" />
-            <div className="h-4 w-1/2 skeleton rounded" />
-            <div className="h-4 w-1/3 skeleton rounded" />
+            <div className="h-10 w-3/4 apple-skeleton rounded-xl" />
+            <div className="h-5 w-1/3 apple-skeleton rounded-lg" />
+            <div className="h-24 w-full apple-skeleton rounded-xl" />
           </div>
         </div>
       </div>
@@ -139,36 +144,56 @@ export default function GameDetail({ user }: GameDetailProps) {
 
   if (!game) {
     return (
-      <div className="max-w-5xl mx-auto px-4 py-20 text-center">
-        <p className="text-text-muted">Game not found</p>
+      <div className="max-w-4xl mx-auto px-4 py-24 text-center">
+        <AlertCircle className="w-12 h-12 text-white/30 mx-auto mb-4" />
+        <h2 className="text-xl font-bold text-white mb-2">Game Not Found</h2>
+        <p className="text-sm text-white/50 mb-6">We couldn't retrieve the details for this title.</p>
+        <Link
+          to="/"
+          className="px-5 py-2.5 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-semibold tracking-wide transition-all"
+        >
+          Return Home
+        </Link>
       </div>
     );
   }
 
-  const year = game.release_date
+  const releaseYear = game.release_date
     ? new Date(game.release_date).getFullYear()
     : null;
 
   return (
-    <div className="relative min-h-[calc(100vh-4rem)]">
-      {/* Cinematic Backdrop Banner */}
-      {game.background_url && (
-        <div className="absolute top-0 left-0 right-0 h-96 overflow-hidden pointer-events-none opacity-20 -z-0">
+    <div className="relative min-h-screen pb-24">
+      {/* ========================================================= */}
+      {/* 1. CINEMATIC FULL-BLEED BACKDROP                          */}
+      {/* ========================================================= */}
+      <div className="absolute top-0 left-0 right-0 h-[520px] overflow-hidden pointer-events-none -z-0">
+        {game.background_url ? (
           <img
             src={game.background_url}
             alt=""
-            className="w-full h-full object-cover filter blur-xs scale-105"
+            className="w-full h-full object-cover filter blur-[2px] brightness-[0.4] scale-105"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-bg-primary/80 to-bg-primary" />
-        </div>
-      )}
+        ) : game.cover_url ? (
+          <img
+            src={game.cover_url}
+            alt=""
+            className="w-full h-full object-cover filter blur-[20px] brightness-[0.3] scale-110"
+          />
+        ) : null}
+        {/* Soft edge fade into obsidian canvas */}
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#070709]/75 to-[#070709]" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#070709] via-transparent to-transparent" />
+      </div>
 
-      <div className="relative z-10 max-w-5xl mx-auto px-4 py-10">
-        {/* Hero section */}
-        <div className="flex flex-col md:flex-row gap-8 mb-10">
-          {/* Cover */}
-          <div className="w-48 md:w-64 flex-shrink-0 mx-auto md:mx-0">
-            <div className="aspect-[3/4] rounded-xl overflow-hidden bg-bg-card border border-border shadow-2xl shadow-black/50">
+      {/* ========================================================= */}
+      {/* 2. GAME DETAIL HERO                                       */}
+      {/* ========================================================= */}
+      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 pt-10 sm:pt-16">
+        <div className="flex flex-col md:flex-row gap-8 lg:gap-12">
+          {/* Floating Poster Card */}
+          <div className="w-52 sm:w-64 flex-shrink-0 mx-auto md:mx-0">
+            <div className="aspect-[2/3] rounded-2xl overflow-hidden bg-[#121319] border border-white/20 shadow-[0_24px_50px_rgba(0,0,0,0.9)] relative group">
               {game.cover_url ? (
                 <img
                   src={game.cover_url}
@@ -176,190 +201,258 @@ export default function GameDetail({ user }: GameDetailProps) {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-text-muted">
-                  No Image
+                <div className="w-full h-full flex flex-col items-center justify-center text-white/30 p-4">
+                  <Gamepad2 className="w-10 h-10 mb-2 stroke-[1.2]" />
+                  <span className="text-xs uppercase tracking-wider">No Cover</span>
                 </div>
               )}
             </div>
           </div>
 
-        {/* Info */}
-        <div className="flex-1">
-          <h1 className="text-3xl md:text-4xl font-bold mb-2">{game.title}</h1>
+          {/* Title & Metadata */}
+          <div className="flex-1 flex flex-col justify-end">
+            {/* Badges */}
+            <div className="flex items-center gap-2 flex-wrap mb-3">
+              {releaseYear && (
+                <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-white/10 backdrop-blur-md text-white/90 border border-white/10">
+                  {releaseYear}
+                </span>
+              )}
+              {game.developer && (
+                <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-white/10 backdrop-blur-md text-white/80 border border-white/10">
+                  {game.developer}
+                </span>
+              )}
+            </div>
 
-          <div className="flex flex-wrap items-center gap-2 text-text-secondary mb-4">
-            {year && <span>{year}</span>}
-            {game.developer && (
-              <>
-                <span className="text-text-muted">·</span>
-                <span>{game.developer}</span>
-              </>
+            {/* Title */}
+            <h1 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight leading-tight mb-4 drop-shadow-md">
+              {game.title}
+            </h1>
+
+            {/* Platforms */}
+            {game.platforms.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mb-5">
+                {game.platforms.map((p) => (
+                  <span
+                    key={p}
+                    className="text-[11px] font-medium px-2.5 py-1 rounded-md bg-white/[0.06] border border-white/[0.08] text-white/70"
+                  >
+                    {p}
+                  </span>
+                ))}
+              </div>
+            )}
+
+            {/* Community Rating Pill */}
+            <div className="flex items-center gap-4 py-3 px-4 rounded-2xl apple-glass w-fit mb-6 border border-white/10">
+              <div className="flex items-center gap-2">
+                <StarRating value={stats?.avg_rating ?? null} readonly size={18} />
+                <span className="text-base font-bold text-white">
+                  {stats?.avg_rating ? stats.avg_rating.toFixed(2) : '—'}
+                </span>
+              </div>
+              <div className="h-4 w-px bg-white/15" />
+              <div className="text-xs text-white/50">
+                <strong className="text-white font-semibold">{stats?.total_ratings || 0}</strong> {stats?.total_ratings === 1 ? 'rating' : 'ratings'}
+              </div>
+              {stats?.total_favorites ? (
+                <>
+                  <div className="h-4 w-px bg-white/15" />
+                  <div className="flex items-center gap-1.5 text-xs text-[#E50914] font-medium">
+                    <Heart className="w-3.5 h-3.5 fill-[#E50914]" />
+                    <span>{stats.total_favorites}</span>
+                  </div>
+                </>
+              ) : null}
+            </div>
+
+            {/* Genres */}
+            {game.genres.length > 0 && (
+              <div className="flex flex-wrap gap-2 text-xs text-white/60">
+                {game.genres.map((g) => (
+                  <span key={g} className="hover:text-white transition-colors">
+                    #{g}
+                  </span>
+                ))}
+              </div>
             )}
           </div>
-
-          {/* Platforms */}
-          {game.platforms.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 mb-5">
-              {game.platforms.map((p) => (
-                <span
-                  key={p}
-                  className="text-xs px-2.5 py-1 rounded-md bg-bg-card border border-border text-text-secondary"
-                >
-                  {p}
-                </span>
-              ))}
-            </div>
-          )}
-
-          {/* Community rating */}
-          {stats && stats.total_ratings > 0 && (
-            <div className="flex items-center gap-3 mb-5">
-              <StarRating value={stats.avg_rating} readonly size={20} />
-              <span className="text-lg font-semibold text-text-primary">
-                {stats.avg_rating?.toFixed(2)}
-              </span>
-              <span className="text-sm text-text-muted">
-                {stats.total_ratings.toLocaleString()} {stats.total_ratings === 1 ? 'rating' : 'ratings'}
-              </span>
-            </div>
-          )}
-
-          {/* Genres */}
-          {game.genres.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 mb-5">
-              {game.genres.map((g) => (
-                <span
-                  key={g}
-                  className="text-xs px-2.5 py-1 rounded-full bg-bg-secondary border border-border text-text-muted"
-                >
-                  {g}
-                </span>
-              ))}
-            </div>
-          )}
-
-          {/* Description */}
-          {game.description && (
-            <p className="text-sm text-text-secondary leading-relaxed line-clamp-4">
-              {game.description}
-            </p>
-          )}
         </div>
-      </div>
 
-      {/* Divider */}
-      <div className="border-t border-border mb-8" />
-
-      {/* Your interaction section */}
-      {user && (
-        <div className="mb-10">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-6 mb-6">
-            {/* Your rating */}
+        {/* ========================================================= */}
+        {/* 3. YOUR DIARY LOGGING STAGE (RATE / LOVE / REVIEW)        */}
+        {/* ========================================================= */}
+        <section className="mt-10 p-6 sm:p-8 rounded-3xl apple-glass border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.6)]">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-white/[0.08]">
+            {/* Rating Section */}
             <div>
-              <p className="text-xs text-text-muted uppercase tracking-wider mb-2">Your Rating</p>
-              <StarRating
-                value={status?.rating ?? null}
-                onChange={handleRate}
-                size={28}
-                showValue
-              />
+              <p className="text-xs font-bold uppercase tracking-wider text-white/40 mb-2">
+                Your Rating
+              </p>
+              <div className="flex items-center gap-3">
+                <StarRating
+                  value={status?.rating ?? null}
+                  onChange={handleRate}
+                  size={28}
+                  showValue
+                />
+              </div>
             </div>
 
-            {/* Love button */}
-            <div>
-              <p className="text-xs text-text-muted uppercase tracking-wider mb-2">Love</p>
-              <LoveButton
-                loved={status?.is_favorite ?? false}
-                onClick={handleLove}
-                size={28}
-                showLabel
-              />
+            {/* Love Button Section */}
+            <div className="flex items-center gap-3">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wider text-white/40 mb-2">
+                  Favorite
+                </p>
+                <LoveButton
+                  loved={status?.is_favorite ?? false}
+                  onClick={handleLove}
+                  size={20}
+                  showLabel
+                  variant="pill"
+                />
+              </div>
             </div>
           </div>
 
-          {/* Review section */}
-          <div>
-            <p className="text-xs text-text-muted uppercase tracking-wider mb-3">Your Review</p>
-            {status?.review && !editingReview ? (
-              <div className="bg-bg-card rounded-xl border border-border p-4">
-                <p className="text-sm text-text-secondary leading-relaxed mb-3">
+          {/* Review Box */}
+          <div className="mt-6">
+            <p className="text-xs font-bold uppercase tracking-wider text-white/40 mb-3 flex items-center justify-between">
+              <span>Your Review & Thoughts</span>
+              {status?.review && !isEditingReview && (
+                <span className="text-emerald-400 font-medium normal-case text-[11px] flex items-center gap-1">
+                  ✓ Review logged to diary
+                </span>
+              )}
+            </p>
+
+            {status?.review && !isEditingReview ? (
+              <div className="p-4 rounded-2xl bg-white/[0.04] border border-white/[0.08]">
+                <p className="text-sm text-white/90 leading-relaxed whitespace-pre-wrap">
                   {status.review.body}
                 </p>
-                <div className="flex gap-3">
+                <div className="flex items-center gap-3 mt-3 pt-3 border-t border-white/[0.06]">
                   <button
-                    onClick={() => setEditingReview(true)}
-                    className="text-xs text-text-muted hover:text-text-primary transition-colors"
+                    onClick={() => setIsEditingReview(true)}
+                    className="text-xs font-semibold text-white/60 hover:text-white flex items-center gap-1.5 transition-colors"
                   >
-                    Edit
+                    <Edit3 className="w-3.5 h-3.5" />
+                    <span>Edit Review</span>
                   </button>
                   <button
                     onClick={handleDeleteReview}
-                    className="text-xs text-accent hover:text-accent-dark transition-colors"
+                    className="text-xs font-semibold text-white/40 hover:text-[#E50914] flex items-center gap-1.5 transition-colors"
                   >
-                    Delete
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Delete</span>
                   </button>
                 </div>
               </div>
             ) : (
-              <div className="bg-bg-card rounded-xl border border-border p-4">
+              <div className="space-y-3">
                 <textarea
                   value={reviewText}
                   onChange={(e) => setReviewText(e.target.value)}
-                  placeholder="Write your review here..."
-                  className="w-full h-32 bg-transparent text-text-primary placeholder:text-text-muted outline-none resize-none mb-3 text-sm"
+                  placeholder={
+                    user
+                      ? "Write a review... What made this game special or memorable?"
+                      : "Log in to write a review for this game..."
+                  }
+                  rows={3}
+                  maxLength={5000}
+                  disabled={!user}
+                  className="w-full p-4 rounded-2xl bg-black/40 border border-white/10 text-white placeholder:text-white/30 text-sm outline-none focus:border-white/30 transition-all resize-none font-normal"
                 />
-                <div className="flex items-center justify-between">
-                  <label className="flex items-center gap-2 text-sm text-text-secondary cursor-pointer">
+
+                <div className="flex items-center justify-between flex-wrap gap-3">
+                  <label className="flex items-center gap-2 text-xs text-white/60 select-none cursor-pointer">
                     <input
                       type="checkbox"
                       checked={spoilers}
                       onChange={(e) => setSpoilers(e.target.checked)}
-                      className="rounded border-border bg-bg-secondary text-accent focus:ring-accent"
+                      className="accent-[#E50914] rounded cursor-pointer"
                     />
-                    Contains spoilers
+                    <span>Contains Spoilers</span>
                   </label>
-                  <div className="flex gap-3">
-                    {editingReview && (
+
+                  <div className="flex items-center gap-2">
+                    {isEditingReview && (
                       <button
                         onClick={() => {
-                          setEditingReview(false);
+                          setIsEditingReview(false);
                           setReviewText(status?.review?.body || '');
                           setSpoilers(status?.review?.contains_spoilers || false);
                         }}
-                        className="text-sm text-text-muted hover:text-text-primary transition-colors"
+                        className="px-4 py-2 text-xs font-semibold text-white/60 hover:text-white transition-colors"
                       >
                         Cancel
                       </button>
                     )}
+
                     <button
-                      onClick={handleSubmitReview}
-                      disabled={!reviewText.trim() || submittingReview}
-                      className="px-4 py-1.5 bg-accent hover:bg-accent-dark text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
+                      onClick={user ? handleSubmitReview : () => navigate('/login')}
+                      disabled={Boolean(user && (!reviewText.trim() || submittingReview))}
+                      className="px-6 py-2 rounded-full text-xs font-semibold bg-white text-black hover:bg-white/90 shadow-[0_4px_20px_rgba(255,255,255,0.15)] disabled:opacity-40 transition-all hover:scale-[1.02] active:scale-[0.98]"
                     >
-                      {submittingReview ? 'Saving...' : 'Save Review'}
+                      {submittingReview
+                        ? 'Publishing...'
+                        : status?.review
+                          ? 'Update Review'
+                          : user
+                            ? 'Publish Review'
+                            : 'Log in to Review'}
                     </button>
                   </div>
                 </div>
               </div>
             )}
           </div>
-        </div>
-      )}
+        </section>
 
-      {/* Reviews list */}
-      <div>
-        <h2 className="text-xl font-bold mb-4">Reviews</h2>
-        {reviews.length > 0 ? (
-          <div className="space-y-4">
-            {reviews.map((review) => (
-              <ReviewCard key={review.id} review={review} />
-            ))}
-          </div>
-        ) : (
-          <p className="text-text-muted">No reviews yet. Be the first to review this game!</p>
+        {/* ========================================================= */}
+        {/* 4. ABOUT & OVERVIEW                                       */}
+        {/* ========================================================= */}
+        {game.description && (
+          <section className="mt-12">
+            <h2 className="text-lg font-bold tracking-tight text-white mb-3">
+              About the Game
+            </h2>
+            <div className="p-6 rounded-2xl apple-glass-subtle border border-white/[0.06]">
+              <p className="text-sm text-white/80 leading-relaxed whitespace-pre-line font-normal">
+                {game.description}
+              </p>
+            </div>
+          </section>
         )}
+
+        {/* ========================================================= */}
+        {/* 5. COMMUNITY REVIEWS DIARY                                */}
+        {/* ========================================================= */}
+        <section className="mt-12">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-bold tracking-tight text-white flex items-center gap-2">
+              <span>Community Reviews</span>
+              <span className="text-xs font-normal text-white/40">({reviews.length})</span>
+            </h2>
+          </div>
+
+          {reviews.length > 0 ? (
+            <div className="space-y-3">
+              {reviews.map((rev) => (
+                <ReviewCard key={rev.id} review={rev} />
+              ))}
+            </div>
+          ) : (
+            <div className="p-10 rounded-2xl apple-glass-subtle border border-white/[0.06] text-center">
+              <MessageSquarePlus className="w-8 h-8 text-white/20 mx-auto mb-2" />
+              <p className="text-sm font-medium text-white/60">No reviews yet.</p>
+              <p className="text-xs text-white/35 mt-1">Be the first to share your thoughts on this game.</p>
+            </div>
+          )}
+        </section>
       </div>
     </div>
-  </div>
   );
 }
