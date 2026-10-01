@@ -16,7 +16,7 @@ export default function Profile() {
   const [favorites, setFavorites] = useState<UserFavorite[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState<'overview' | 'ratings' | 'reviews'>('overview');
+  const [tab, setTab] = useState<'overview' | 'ratings' | 'reviews' | 'favorites'>('overview');
 
   useEffect(() => {
     setLoading(true);
@@ -88,7 +88,7 @@ export default function Profile() {
 
       {/* Tabs */}
       <div className="flex gap-6 border-b border-border mb-8">
-        {(['overview', 'ratings', 'reviews'] as const).map((t) => (
+        {(['overview', 'ratings', 'reviews', 'favorites'] as const).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -199,6 +199,26 @@ export default function Profile() {
           {reviews.length === 0 && (
             <div className="text-center py-16">
               <p className="text-text-muted">No reviews yet.</p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {tab === 'favorites' && (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+          {favorites.map((fav) => (
+            <div key={fav.game.rawg_id}>
+              <GameCard
+                rawgId={fav.game.rawg_id}
+                title={fav.game.title}
+                slug={fav.game.slug}
+                coverUrl={fav.game.cover_url}
+              />
+            </div>
+          ))}
+          {favorites.length === 0 && (
+            <div className="col-span-full text-center py-16">
+              <p className="text-text-muted">No favorites yet.</p>
             </div>
           )}
         </div>
