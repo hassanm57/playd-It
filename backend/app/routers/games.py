@@ -120,6 +120,48 @@ async def search_games(q: str = Query(min_length=1, max_length=200)):
     return results
 
 
+async def fetch_rawg_trending(page_size: int = 18):
+    """Fetch all-time popular games from RAWG."""
+    async with httpx.AsyncClient() as client:
+        response = await client.get(
+            f"{settings.RAWG_BASE_URL}/games",
+            params={
+                "key": settings.RAWG_API_KEY,
+                "ordering": "-added",
+                "page_size": page_size,
+            },
+            timeout=10.0,
+        )
+        response.raise_for_status()
+        return response.json()
+
+
+@router.get("/trending", response_model=list[GameSearchResult])
+async def get_trending_games(limit: int = Query(18, ge=1, le=50)):
+    """Get popular/trending games to populate discovery & home."""
+    try:
+        data = await fetch_rawg_trending(page_size=limit)
+    except Exception:
+        return []
+
+    results = []
+    for game in data.get("results", []):
+        platforms = []
+        for p in game.get("platforms", []) or []:
+            plat = p.get("platform", {})
+            if plat.get("name"):
+                platforms.append(plat["name"])
+        results.append(GameSearchResult(
+            rawg_id=game["id"],
+            title=game.get("name", ""),
+            slug=game.get("slug", ""),
+            cover_url=game.get("background_image", None),
+            release_date=game.get("released", None),
+            platforms=platforms,
+        ))
+    return results
+
+
 @router.get("/{rawg_id}", response_model=GameDetail)
 async def get_game(rawg_id: int, db: Session = Depends(get_db)):
     """Get game detail. Fetches from RAWG if not cached."""
