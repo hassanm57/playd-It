@@ -1,0 +1,83 @@
+@import 'tailwindcss';
+
+/* === PLAYD Design Tokens === */
+@theme {
+  --color-bg-primary: #0D0D0F;
+  --color-bg-secondary: #151518;
+  --color-bg-card: #1B1B20;
+  --color-bg-card-hover: #222228;
+  --color-text-primary: #F5F5F5;
+  --color-text-secondary: #A1A1AA;
+  --color-text-muted: #71717A;
+  --color-accent: #E50914;
+  --color-accent-dark: #B20710;
+  --color-accent-glow: rgba(229, 9, 20, 0.15);
+  --color-border: #27272A;
+  --color-border-light: #3f3f46;
+}
+
+/* === Base Styles === */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  background-color: #0D0D0F;
+  color: #F5F5F5;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  min-height: 100vh;
+  background-color: #0D0D0F;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0D0D0F;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #27272A;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3f3f46;
+}
+
+/* Star rating styles */
+.star-rating {
+  display: inline-flex;
+  gap: 2px;
+}
+
+.star-rating .star {
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+.star-rating .star:hover {
+  transform: scale(1.15);
+}
+
+/* Skeleton animation */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #1B1B20 25%, #27272A 50%, #1B1B20 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: 6px;
+}
