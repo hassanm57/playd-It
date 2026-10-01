@@ -43,6 +43,7 @@ export const authAPI = {
 export const gamesAPI = {
   search: (q: string) => api.get(`/games/search?q=${encodeURIComponent(q)}`),
   getTrending: (limit = 18) => api.get(`/games/trending?limit=${limit}`),
+  getHomeFeed: () => api.get('/games/home-feed'),
   getDetail: (rawgId: number) => api.get(`/games/${rawgId}`),
   getStats: (rawgId: number) => api.get(`/games/${rawgId}/stats`),
   getStatus: (rawgId: number) => api.get(`/games/${rawgId}/status`),

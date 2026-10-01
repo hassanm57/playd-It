@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Gamepad2, Star } from 'lucide-react';
+import { PlatformIconList } from './PlatformIcon';
 
 interface GameCardProps {
   rawgId: number;
@@ -26,35 +27,19 @@ export default function GameCard({
   const [imageError, setImageError] = useState(false);
 
   const year = releaseDate ? new Date(releaseDate).getFullYear() : null;
-
-  // Shorten platform names with clean modern tags
-  const shortPlatforms = platforms.slice(0, 3).map((p) => {
-    if (p.includes('PlayStation 5')) return 'PS5';
-    if (p.includes('PlayStation 4')) return 'PS4';
-    if (p.includes('PlayStation')) return 'PS';
-    if (p.includes('Xbox Series')) return 'XSX';
-    if (p.includes('Xbox One')) return 'XB1';
-    if (p.includes('Xbox')) return 'Xbox';
-    if (p.includes('Nintendo Switch') || p.includes('Switch')) return 'Switch';
-    if (p.includes('PC')) return 'PC';
-    if (p.includes('macOS') || p.includes('Mac')) return 'Mac';
-    if (p.includes('iOS') || p.includes('Android')) return 'Mobile';
-    return p.split(' ')[0];
-  });
-
   const aspectClass = aspect === 'landscape' ? 'aspect-[16/9]' : 'aspect-[2/3]';
 
   return (
     <Link
       to={`/game/${rawgId}`}
-      className="group relative block focus:outline-none"
+      className="group relative block w-full focus:outline-none select-none"
     >
       {/* Ambient shadow glow on hover */}
-      <div className="absolute -inset-1.5 rounded-[22px] bg-gradient-to-b from-white/10 to-transparent opacity-0 blur-xl transition-all duration-500 group-hover:opacity-100 group-hover:scale-105 pointer-events-none" />
+      <div className="absolute -inset-1.5 rounded-[22px] bg-gradient-to-b from-white/15 to-transparent opacity-0 blur-xl transition-all duration-500 group-hover:opacity-100 group-hover:scale-105 pointer-events-none" />
 
       {/* Main Poster Container */}
       <div
-        className={`apple-poster-card relative w-full ${aspectClass} rounded-2xl overflow-hidden bg-[#111218] border border-white/[0.08] group-hover:border-white/25`}
+        className={`apple-poster-card relative w-full ${aspectClass} rounded-2xl overflow-hidden bg-[#121319] border border-white/[0.08] group-hover:border-white/25 shadow-lg`}
       >
         {/* Placeholder / Skeleton while loading */}
         {!imageLoaded && !imageError && (
@@ -81,48 +66,47 @@ export default function GameCard({
         )}
 
         {/* Cinematic Vignette Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/15 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-300 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-60 group-hover:opacity-85 transition-opacity duration-300 pointer-events-none" />
 
-        {/* Top Badges (Rating / Loved) */}
+        {/* Top Badges (Rating / Community Score) */}
         {rating !== undefined && rating !== null && (
-          <div className="absolute top-2.5 right-2.5 flex items-center gap-1 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md border border-white/15 text-[11px] font-semibold text-white shadow-lg">
+          <div className="absolute top-2.5 right-2.5 flex items-center gap-1 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md border border-white/15 text-[11px] font-bold text-white shadow-lg">
             <Star className="w-3 h-3 text-[#E50914] fill-[#E50914]" />
             <span>{rating.toFixed(1)}</span>
           </div>
         )}
 
-        {/* Hover Action Overlay */}
-        <div className="absolute inset-0 flex flex-col justify-end p-3.5 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
-          <div className="flex items-center gap-1.5 mb-1.5 flex-wrap">
-            {shortPlatforms.slice(0, 2).map((plat) => (
-              <span
-                key={plat}
-                className="text-[10px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded bg-white/20 backdrop-blur-md text-white border border-white/20"
-              >
-                {plat}
-              </span>
-            ))}
-          </div>
+        {/* Hover Action Overlay with Minimalist Platform Icons */}
+        <div className="absolute inset-0 flex flex-col justify-end p-3.5 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 pointer-events-none">
+          {platforms.length > 0 && (
+            <div className="mb-2">
+              <PlatformIconList
+                platforms={platforms}
+                max={4}
+                className="flex items-center gap-2 px-2 py-1 rounded-md bg-black/60 backdrop-blur-md border border-white/15 w-fit text-white"
+              />
+            </div>
+          )}
 
-          <p className="text-xs font-semibold text-white drop-shadow-md truncate">
-            View Details
+          <p className="text-xs font-bold text-white drop-shadow-md truncate flex items-center gap-1">
+            <span>View Details</span>
+            <span className="text-[#E50914]">→</span>
           </p>
         </div>
       </div>
 
-      {/* Title & Metadata (Underneath card for Apple TV grid elegance) */}
+      {/* Title & Metadata (Underneath card with Minimalist Platform Icons) */}
       <div className="mt-2.5 px-0.5">
-        <h3 className="text-[13px] font-medium text-white/90 group-hover:text-white truncate transition-colors tracking-tight">
+        <h3 className="text-xs sm:text-sm font-semibold text-white/95 group-hover:text-white truncate transition-colors tracking-tight">
           {title}
         </h3>
-        <div className="flex items-center gap-1.5 mt-0.5 text-[11px] text-[#8E8E98]">
-          {year && <span>{year}</span>}
-          {year && shortPlatforms.length > 0 && <span className="text-white/20">·</span>}
-          {shortPlatforms.length > 0 && (
-            <span className="truncate">
-              {shortPlatforms.join(', ')}
-            </span>
-          )}
+        <div className="flex items-center justify-between gap-2 mt-1 text-[11px] text-white/45">
+          <span>{year || '—'}</span>
+          <PlatformIconList
+            platforms={platforms}
+            max={3}
+            className="flex items-center gap-1.5 text-white/40 group-hover:text-white/80 transition-colors"
+          />
         </div>
       </div>
     </Link>

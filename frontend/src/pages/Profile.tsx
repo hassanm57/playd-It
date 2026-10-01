@@ -37,7 +37,7 @@ export default function Profile() {
 
   if (loading) {
     return (
-      <div className="max-w-6xl mx-auto px-4 py-16">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-16">
         <div className="flex flex-col items-center gap-4 mb-12">
           <div className="w-24 h-24 rounded-full apple-skeleton" />
           <div className="h-6 w-36 apple-skeleton rounded-lg" />
@@ -166,7 +166,7 @@ export default function Profile() {
             <button
               key={t}
               onClick={() => setTab(t)}
-              className={`px-5 py-2 rounded-full text-xs font-semibold tracking-wide transition-all select-none ${
+              className={`px-5 py-2 rounded-full text-xs font-semibold tracking-wide transition-all select-none cursor-pointer ${
                 tab === t
                   ? 'bg-white text-black shadow-md scale-105'
                   : 'text-white/60 hover:text-white hover:bg-white/[0.08]'
@@ -185,7 +185,7 @@ export default function Profile() {
 
         {/* TAB 1: OVERVIEW */}
         {tab === 'overview' && (
-          <div className="space-y-12">
+          <div className="space-y-14">
             {/* Pinned Top Favorites */}
             {favorites.length > 0 && (
               <section>
@@ -196,13 +196,13 @@ export default function Profile() {
                   </h2>
                   <button
                     onClick={() => setTab('favorites')}
-                    className="text-xs font-semibold text-white/40 hover:text-white transition-colors"
+                    className="text-xs font-semibold text-white/40 hover:text-white transition-colors cursor-pointer"
                   >
-                    View All ({favorites.length})
+                    View All ({favorites.length}) →
                   </button>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-5">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-5">
                   {favorites.slice(0, 6).map((fav) => (
                     <GameCard
                       key={fav.game.rawg_id}
@@ -227,13 +227,13 @@ export default function Profile() {
                   </h2>
                   <button
                     onClick={() => setTab('ratings')}
-                    className="text-xs font-semibold text-white/40 hover:text-white transition-colors"
+                    className="text-xs font-semibold text-white/40 hover:text-white transition-colors cursor-pointer"
                   >
-                    View All ({ratings.length})
+                    View All ({ratings.length}) →
                   </button>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-5">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-5">
                   {ratings.slice(0, 12).map((item) => (
                     <GameCard
                       key={item.game.rawg_id}
@@ -259,13 +259,13 @@ export default function Profile() {
                   </h2>
                   <button
                     onClick={() => setTab('reviews')}
-                    className="text-xs font-semibold text-white/40 hover:text-white transition-colors"
+                    className="text-xs font-semibold text-white/40 hover:text-white transition-colors cursor-pointer"
                   >
-                    View All ({reviews.length})
+                    View All ({reviews.length}) →
                   </button>
                 </div>
 
-                <div className="space-y-3">
+                <div className="max-w-3xl mx-auto space-y-4">
                   {reviews.slice(0, 4).map((review) => (
                     <ReviewCard key={review.id} review={review} />
                   ))}
@@ -274,15 +274,15 @@ export default function Profile() {
             )}
 
             {ratings.length === 0 && favorites.length === 0 && (
-              <div className="text-center py-20 p-8 rounded-3xl apple-glass border border-white/[0.08]">
+              <div className="text-center py-20 p-8 rounded-3xl apple-glass border border-white/[0.08] max-w-md mx-auto">
                 <Gamepad2 className="w-12 h-12 text-white/20 mx-auto mb-3" />
                 <h3 className="text-base font-bold text-white mb-1">No Activity Yet</h3>
-                <p className="text-xs text-white/40 max-w-sm mx-auto mb-5">
+                <p className="text-xs sm:text-sm text-white/40 max-w-sm mx-auto mb-5 leading-relaxed font-normal">
                   {cleanUsername} hasn't rated or logged any games on PLAYD yet.
                 </p>
                 <Link
                   to="/"
-                  className="px-5 py-2.5 rounded-full bg-white text-black text-xs font-semibold tracking-wide hover:bg-white/90 transition-all inline-block"
+                  className="px-6 py-2.5 rounded-full bg-white text-black text-xs font-bold tracking-wide hover:bg-white/90 transition-all inline-block shadow-lg"
                 >
                   Search Games to Log
                 </Link>
@@ -294,7 +294,7 @@ export default function Profile() {
         {/* TAB 2: RATINGS */}
         {tab === 'ratings' && (
           <div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-5">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-5">
               {ratings.map((item) => (
                 <GameCard
                   key={item.game.rawg_id}
@@ -308,7 +308,7 @@ export default function Profile() {
               ))}
             </div>
             {ratings.length === 0 && (
-              <div className="text-center py-20 text-white/40 text-sm">
+              <div className="text-center py-20 text-white/40 text-sm max-w-md mx-auto">
                 No ratings logged yet.
               </div>
             )}
@@ -318,7 +318,7 @@ export default function Profile() {
         {/* TAB 3: FAVORITES */}
         {tab === 'favorites' && (
           <div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-5">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-5">
               {favorites.map((fav) => (
                 <GameCard
                   key={fav.game.rawg_id}
@@ -331,7 +331,7 @@ export default function Profile() {
               ))}
             </div>
             {favorites.length === 0 && (
-              <div className="text-center py-20 text-white/40 text-sm">
+              <div className="text-center py-20 text-white/40 text-sm max-w-md mx-auto">
                 No favorite games added yet.
               </div>
             )}

@@ -3,6 +3,8 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 from typing import Optional
 import httpx
+import asyncio
+import time
 from datetime import datetime, timezone
 
 from app.database import get_db
@@ -160,6 +162,96 @@ async def get_trending_games(limit: int = Query(18, ge=1, le=50)):
             platforms=platforms,
         ))
     return results
+
+
+_feed_cache = None
+_feed_cache_time = 0
+
+
+def _parse_game_results(data: dict) -> list[GameSearchResult]:
+    results = []
+    for game in data.get("results", []) or []:
+        platforms = []
+        for p in game.get("platforms", []) or []:
+            plat = p.get("platform", {})
+            if plat.get("name"):
+                platforms.append(plat["name"])
+        results.append(GameSearchResult(
+            rawg_id=game["id"],
+            title=game.get("name", ""),
+            slug=game.get("slug", ""),
+            cover_url=game.get("background_image", None),
+            release_date=game.get("released", None),
+            platforms=platforms,
+        ))
+    return results
+
+
+@router.get("/home-feed")
+async def get_home_feed():
+    """Fetch multi-category Netflix-style game shelves for the homepage."""
+    global _feed_cache, _feed_cache_time
+    now = time.time()
+    if _feed_cache and (now - _feed_cache_time < 600):
+        return _feed_cache
+
+    k = settings.RAWG_API_KEY
+    async with httpx.AsyncClient() as client:
+        try:
+            req_trending = client.get(
+                f"{settings.RAWG_BASE_URL}/games",
+                params={"key": k, "ordering": "-added", "page_size": 14},
+                timeout=12.0,
+            )
+            req_latest = client.get(
+                f"{settings.RAWG_BASE_URL}/games",
+                params={"key": k, "dates": "2023-01-01,2026-10-01", "ordering": "-added", "page_size": 14},
+                timeout=12.0,
+            )
+            req_rpg = client.get(
+                f"{settings.RAWG_BASE_URL}/games",
+                params={"key": k, "genres": "role-playing-games-rpg", "ordering": "-added", "page_size": 14},
+                timeout=12.0,
+            )
+            req_action = client.get(
+                f"{settings.RAWG_BASE_URL}/games",
+                params={"key": k, "genres": "action", "ordering": "-added", "page_size": 14},
+                timeout=12.0,
+            )
+            req_top = client.get(
+                f"{settings.RAWG_BASE_URL}/games",
+                params={"key": k, "ordering": "-rating", "page_size": 14},
+                timeout=12.0,
+            )
+
+            resps = await asyncio.gather(req_trending, req_latest, req_rpg, req_action, req_top, return_exceptions=True)
+
+            trending = _parse_game_results(resps[0].json()) if not isinstance(resps[0], Exception) else []
+            latest = _parse_game_results(resps[1].json()) if not isinstance(resps[1], Exception) else []
+            rpg = _parse_game_results(resps[2].json()) if not isinstance(resps[2], Exception) else []
+            action = _parse_game_results(resps[3].json()) if not isinstance(resps[3], Exception) else []
+            top_rated = _parse_game_results(resps[4].json()) if not isinstance(resps[4], Exception) else []
+
+            feed = {
+                "featured": trending[:5],
+                "trending": trending,
+                "latest": latest,
+                "rpg": rpg,
+                "action": action,
+                "top_rated": top_rated,
+            }
+            _feed_cache = feed
+            _feed_cache_time = now
+            return feed
+        except Exception:
+            return _feed_cache or {
+                "featured": [],
+                "trending": [],
+                "latest": [],
+                "rpg": [],
+                "action": [],
+                "top_rated": [],
+            }
 
 
 @router.get("/{rawg_id}", response_model=GameDetail)

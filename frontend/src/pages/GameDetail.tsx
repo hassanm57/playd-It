@@ -4,6 +4,7 @@ import { Heart, Gamepad2, AlertCircle, MessageSquarePlus, Trash2, Edit3 } from '
 import StarRating from '../components/StarRating';
 import LoveButton from '../components/LoveButton';
 import ReviewCard from '../components/ReviewCard';
+import PlatformIcon, { getPlatformFamilyName } from '../components/PlatformIcon';
 import { gamesAPI, ratingsAPI, favoritesAPI, reviewsAPI } from '../lib/api';
 import type { GameDetail as GameDetailType, GameStats, UserGameStatus, Review, User } from '../types';
 
@@ -230,15 +231,16 @@ export default function GameDetail({ user }: GameDetailProps) {
               {game.title}
             </h1>
 
-            {/* Platforms */}
+            {/* Platforms with Minimalist Icons */}
             {game.platforms.length > 0 && (
-              <div className="flex flex-wrap gap-1.5 mb-5">
+              <div className="flex flex-wrap items-center gap-2 mb-5">
                 {game.platforms.map((p) => (
                   <span
                     key={p}
-                    className="text-[11px] font-medium px-2.5 py-1 rounded-md bg-white/[0.06] border border-white/[0.08] text-white/70"
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-white/[0.07] border border-white/[0.1] text-white/85 backdrop-blur-md hover:bg-white/[0.12] transition-colors"
                   >
-                    {p}
+                    <PlatformIcon platform={p} className="w-3.5 h-3.5 text-white/70" />
+                    <span>{getPlatformFamilyName(p)}</span>
                   </span>
                 ))}
               </div>
