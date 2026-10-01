@@ -42,6 +42,7 @@ export const authAPI = {
 // --- Games ---
 export const gamesAPI = {
   search: (q: string) => api.get(`/games/search?q=${encodeURIComponent(q)}`),
+  getTrending: (limit = 18) => api.get(`/games/trending?limit=${limit}`),
   getDetail: (rawgId: number) => api.get(`/games/${rawgId}`),
   getStats: (rawgId: number) => api.get(`/games/${rawgId}/stats`),
   getStatus: (rawgId: number) => api.get(`/games/${rawgId}/status`),

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import SearchBar from '../components/SearchBar';
 import GameCard from '../components/GameCard';
 import type { User, UserRating } from '../types';
-import { usersAPI, discoverAPI } from '../lib/api';
+import { usersAPI, discoverAPI, gamesAPI } from '../lib/api';
 
 interface HomeProps {
   user: User | null;
@@ -19,9 +19,19 @@ export default function Home({ user }: HomeProps) {
         setRecentRatings(res.data.slice(0, 6));
       }).catch(() => {});
     }
-    discoverAPI.popular(8).then((res) => {
-      setPopularGames(res.data);
-    }).catch(() => {});
+    discoverAPI.popular(8).then(async (res) => {
+      if (res.data && res.data.length >= 4) {
+        setPopularGames(res.data);
+      } else {
+        const trendRes = await gamesAPI.getTrending(8);
+        setPopularGames(trendRes.data);
+      }
+    }).catch(async () => {
+      try {
+        const trendRes = await gamesAPI.getTrending(8);
+        setPopularGames(trendRes.data);
+      } catch {}
+    });
   }, [user]);
 
   // Logged out landing

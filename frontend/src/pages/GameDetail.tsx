@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import StarRating from '../components/StarRating';
 import LoveButton from '../components/LoveButton';
 import ReviewCard from '../components/ReviewCard';
@@ -13,6 +13,7 @@ interface GameDetailProps {
 export default function GameDetail({ user }: GameDetailProps) {
   const { rawgId } = useParams<{ rawgId: string }>();
   const id = Number(rawgId);
+  const navigate = useNavigate();
 
   const [game, setGame] = useState<GameDetailType | null>(null);
   const [stats, setStats] = useState<GameStats | null>(null);
@@ -58,7 +59,10 @@ export default function GameDetail({ user }: GameDetailProps) {
   }, [fetchData]);
 
   const handleRate = async (rating: number | null) => {
-    if (!user) return;
+    if (!user) {
+      navigate('/login');
+      return;
+    }
     try {
       if (rating === null) {
         await ratingsAPI.unrate(id);
@@ -76,7 +80,10 @@ export default function GameDetail({ user }: GameDetailProps) {
   };
 
   const handleLove = async () => {
-    if (!user) return;
+    if (!user) {
+      navigate('/login');
+      return;
+    }
     try {
       await favoritesAPI.toggle(id);
       const statusRes = await gamesAPI.getStatus(id);
@@ -143,25 +150,38 @@ export default function GameDetail({ user }: GameDetailProps) {
     : null;
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-10">
-      {/* Hero section */}
-      <div className="flex flex-col md:flex-row gap-8 mb-10">
-        {/* Cover */}
-        <div className="w-48 md:w-64 flex-shrink-0 mx-auto md:mx-0">
-          <div className="aspect-[3/4] rounded-xl overflow-hidden bg-bg-card border border-border">
-            {game.cover_url ? (
-              <img
-                src={game.cover_url}
-                alt={game.title}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-text-muted">
-                No Image
-              </div>
-            )}
-          </div>
+    <div className="relative min-h-[calc(100vh-4rem)]">
+      {/* Cinematic Backdrop Banner */}
+      {game.background_url && (
+        <div className="absolute top-0 left-0 right-0 h-96 overflow-hidden pointer-events-none opacity-20 -z-0">
+          <img
+            src={game.background_url}
+            alt=""
+            className="w-full h-full object-cover filter blur-xs scale-105"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-bg-primary/80 to-bg-primary" />
         </div>
+      )}
+
+      <div className="relative z-10 max-w-5xl mx-auto px-4 py-10">
+        {/* Hero section */}
+        <div className="flex flex-col md:flex-row gap-8 mb-10">
+          {/* Cover */}
+          <div className="w-48 md:w-64 flex-shrink-0 mx-auto md:mx-0">
+            <div className="aspect-[3/4] rounded-xl overflow-hidden bg-bg-card border border-border shadow-2xl shadow-black/50">
+              {game.cover_url ? (
+                <img
+                  src={game.cover_url}
+                  alt={game.title}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-text-muted">
+                  No Image
+                </div>
+              )}
+            </div>
+          </div>
 
         {/* Info */}
         <div className="flex-1">
@@ -340,5 +360,6 @@ export default function GameDetail({ user }: GameDetailProps) {
         )}
       </div>
     </div>
+  </div>
   );
 }
