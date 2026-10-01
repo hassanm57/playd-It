@@ -29,17 +29,17 @@ export default function Search() {
   }, [query]);
 
   return (
-    <div className="min-h-screen pb-24">
+    <div className="min-h-screen pb-32 w-full">
       {/* ========================================================= */}
-      {/* 1. CENTERED TOP SEARCH HEADER                             */}
+      {/* 1. EXPANSIVE CENTERED TOP SEARCH HEADER                   */}
       {/* ========================================================= */}
-      <section className="pt-10 pb-8 border-b border-white/[0.06] bg-gradient-to-b from-white/[0.02] to-transparent">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
-          <div className="max-w-xl mx-auto mb-6">
+      <section className="pt-16 pb-12 border-b border-white/[0.08] bg-gradient-to-b from-white/[0.02] to-transparent w-full">
+        <div className="max-w-4xl mx-auto px-6 text-center">
+          <div className="max-w-2xl mx-auto mb-8">
             <SearchBar large placeholder="Search video games across all platforms..." />
           </div>
 
-          <h1 className="text-xl sm:text-3xl font-extrabold text-white tracking-tight">
+          <h1 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
             {query ? (
               <>
                 Search Results for <span className="text-[#E50914]">"{query}"</span>
@@ -49,7 +49,7 @@ export default function Search() {
             )}
           </h1>
           {results.length > 0 && (
-            <p className="text-xs sm:text-sm text-white/40 mt-1.5 font-medium">
+            <p className="text-sm text-white/50 mt-2 font-medium">
               Found {results.length} titles matching your query
             </p>
           )}
@@ -57,21 +57,21 @@ export default function Search() {
       </section>
 
       {/* ========================================================= */}
-      {/* 2. BALANCED AUTO-FIT RESULTS GRID                         */}
+      {/* 2. BALANCED EXPANSIVE RESULTS GRID                        */}
       {/* ========================================================= */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 pt-10">
+      <main className="max-w-[1700px] mx-auto px-6 sm:px-10 lg:px-14 xl:px-20 pt-12">
         {loading ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6 sm:gap-7">
             {Array.from({ length: 12 }).map((_, i) => (
-              <div key={i} className="space-y-2.5">
-                <div className="aspect-[2/3] rounded-2xl apple-skeleton" />
-                <div className="h-4 w-3/4 rounded-md apple-skeleton" />
-                <div className="h-3 w-1/2 rounded-md apple-skeleton" />
+              <div key={i} className="space-y-3">
+                <div className="aspect-[2/3] rounded-3xl apple-skeleton" />
+                <div className="h-5 w-3/4 rounded-lg apple-skeleton" />
+                <div className="h-4 w-1/2 rounded-lg apple-skeleton" />
               </div>
             ))}
           </div>
         ) : results.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6 sm:gap-7">
             {results.map((game) => (
               <GameCard
                 key={game.rawg_id}
@@ -84,17 +84,17 @@ export default function Search() {
             ))}
           </div>
         ) : query.trim().length >= 2 ? (
-          <div className="text-center py-20 px-8 rounded-3xl apple-glass max-w-md mx-auto border border-white/10 shadow-2xl">
-            <Frown className="w-12 h-12 text-white/30 mx-auto mb-3" />
-            <h3 className="text-lg font-bold text-white mb-1.5">No Games Found</h3>
-            <p className="text-xs sm:text-sm text-white/50 leading-relaxed font-normal">
+          <div className="text-center py-24 px-8 rounded-3xl apple-glass max-w-lg mx-auto border border-white/15 shadow-2xl">
+            <Frown className="w-14 h-14 text-white/30 mx-auto mb-4" />
+            <h3 className="text-xl font-bold text-white mb-2">No Games Found</h3>
+            <p className="text-sm text-white/50 leading-relaxed font-normal">
               We couldn't find any titles matching "{query}". Check the spelling or try searching for another title.
             </p>
           </div>
         ) : (
-          <div className="text-center py-24 max-w-md mx-auto text-white/40">
-            <Sparkles className="w-8 h-8 text-[#E50914]/60 mx-auto mb-3" />
-            <p className="text-sm font-medium text-white/70">Ready to search</p>
+          <div className="text-center py-28 max-w-md mx-auto text-white/40">
+            <Sparkles className="w-10 h-10 text-[#E50914]/60 mx-auto mb-4" />
+            <p className="text-base font-semibold text-white/80">Ready to search</p>
             <p className="text-xs text-white/40 mt-1">
               Type at least 2 characters to search across 800,000+ games.
             </p>

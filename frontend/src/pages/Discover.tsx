@@ -14,9 +14,9 @@ export default function Discover() {
   useEffect(() => {
     Promise.all([
       gamesAPI.getTrending(18).catch(() => ({ data: [] })),
-      discoverAPI.popular(12).catch(() => ({ data: [] })),
-      discoverAPI.topRated(12).catch(() => ({ data: [] })),
-      discoverAPI.recent(12).catch(() => ({ data: [] })),
+      discoverAPI.popular(14).catch(() => ({ data: [] })),
+      discoverAPI.topRated(14).catch(() => ({ data: [] })),
+      discoverAPI.recent(14).catch(() => ({ data: [] })),
     ])
       .then(([trendRes, popRes, topRes, recRes]) => {
         setTrending(trendRes.data);
@@ -28,42 +28,42 @@ export default function Discover() {
   }, []);
 
   return (
-    <div className="min-h-screen pb-24 overflow-x-hidden">
+    <div className="min-h-screen pb-32 overflow-x-hidden w-full">
       {/* ========================================================= */}
-      {/* 1. CINEMATIC DISCOVER HEADER                              */}
+      {/* 1. EXPANSIVE CINEMATIC DISCOVER HEADER                    */}
       {/* ========================================================= */}
-      <section className="relative w-full pt-14 pb-10 overflow-hidden border-b border-white/[0.06]">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2/3 h-56 bg-gradient-to-b from-[#E50914]/15 via-transparent to-transparent blur-3xl pointer-events-none" />
+      <section className="relative w-full pt-16 pb-12 overflow-hidden border-b border-white/[0.08]">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-64 bg-gradient-to-b from-[#E50914]/15 via-transparent to-transparent blur-3xl pointer-events-none" />
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/15 text-xs font-semibold text-white/80 mb-3">
-            <Sparkles className="w-3.5 h-3.5 text-[#E50914]" />
+        <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-xs font-semibold text-white/90 mb-4 shadow-sm">
+            <Sparkles className="w-4 h-4 text-[#E50914]" />
             <span>Curated Game Archives</span>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight mb-3">
+          <h1 className="text-4xl sm:text-6xl font-black text-white tracking-tight mb-4">
             Discover Video Games
           </h1>
-          <p className="text-xs sm:text-sm text-white/50 max-w-lg mx-auto mb-8 font-normal leading-relaxed">
+          <p className="text-sm sm:text-base text-white/60 max-w-xl mx-auto mb-10 font-normal leading-relaxed">
             Browse critically acclaimed titles, all-time community favorites, and trending video games across every platform.
           </p>
 
-          <div className="max-w-xl mx-auto">
+          <div className="max-w-2xl mx-auto">
             <SearchBar large placeholder="Search by game title, developer, or genre..." />
           </div>
         </div>
       </section>
 
       {/* ========================================================= */}
-      {/* 2. CINEMATIC CATEGORY CAROUSELS (APPLE TV STYLE)          */}
+      {/* 2. CINEMATIC CATEGORY CAROUSELS (EXPANSIVE WIDTH)         */}
       {/* ========================================================= */}
-      <main className="space-y-12 pt-8">
+      <main className="space-y-16 sm:space-y-24 pt-10">
         {/* SHELF 1: ALL-TIME FAVORITES */}
         {trending.length > 0 && (
           <GameShelf
             title="All-Time Masterpieces"
             subtitle="Acclaimed titles with universal acclaim across PlayStation, Xbox, Switch & PC"
-            icon={<Sparkles className="w-5 h-5 text-[#E50914]" />}
+            icon={<Sparkles className="w-6 h-6 text-[#E50914]" />}
             games={trending}
           />
         )}
@@ -73,7 +73,7 @@ export default function Discover() {
           <GameShelf
             title="Most Rated on PLAYD"
             subtitle="Titles currently generating the most ratings and reviews in the community"
-            icon={<TrendingUp className="w-5 h-5 text-emerald-400" />}
+            icon={<TrendingUp className="w-6 h-6 text-emerald-400" />}
             games={popular}
           />
         )}
@@ -83,7 +83,7 @@ export default function Discover() {
           <GameShelf
             title="Highest Community Rating"
             subtitle="Top-rated video games according to player diaries and reviews"
-            icon={<Award className="w-5 h-5 text-amber-400" />}
+            icon={<Award className="w-6 h-6 text-amber-400" />}
             games={topRated}
           />
         )}
@@ -93,22 +93,22 @@ export default function Discover() {
           <GameShelf
             title="Recently Active"
             subtitle="Games recently reviewed and logged into member profiles"
-            icon={<Clock className="w-5 h-5 text-sky-400" />}
+            icon={<Clock className="w-6 h-6 text-sky-400" />}
             games={recent}
           />
         )}
 
         {/* Skeletons when loading */}
         {loading && trending.length === 0 && (
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 space-y-12">
+          <div className="w-full px-6 sm:px-10 lg:px-14 xl:px-20 space-y-12">
             {[1, 2].map((row) => (
               <div key={row} className="space-y-4">
-                <div className="h-6 w-48 apple-skeleton rounded-lg" />
-                <div className="flex gap-4 overflow-hidden py-3">
+                <div className="h-7 w-56 apple-skeleton rounded-xl" />
+                <div className="flex gap-5 overflow-hidden py-4">
                   {Array.from({ length: 6 }).map((_, i) => (
                     <div
                       key={i}
-                      className="w-[180px] aspect-[2/3] rounded-2xl apple-skeleton flex-shrink-0"
+                      className="w-[220px] aspect-[2/3] rounded-3xl apple-skeleton flex-shrink-0"
                     />
                   ))}
                 </div>

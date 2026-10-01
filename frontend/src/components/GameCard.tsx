@@ -35,11 +35,11 @@ export default function GameCard({
       className="group relative block w-full focus:outline-none select-none"
     >
       {/* Ambient shadow glow on hover */}
-      <div className="absolute -inset-1.5 rounded-[22px] bg-gradient-to-b from-white/15 to-transparent opacity-0 blur-xl transition-all duration-500 group-hover:opacity-100 group-hover:scale-105 pointer-events-none" />
+      <div className="absolute -inset-2 rounded-[28px] bg-gradient-to-b from-white/15 to-transparent opacity-0 blur-xl transition-all duration-500 group-hover:opacity-100 group-hover:scale-105 pointer-events-none" />
 
       {/* Main Poster Container */}
       <div
-        className={`apple-poster-card relative w-full ${aspectClass} rounded-2xl overflow-hidden bg-[#121319] border border-white/[0.08] group-hover:border-white/25 shadow-lg`}
+        className={`apple-poster-card relative w-full ${aspectClass} rounded-3xl overflow-hidden bg-[#121319] border border-white/[0.08] group-hover:border-white/25 shadow-xl`}
       >
         {/* Placeholder / Skeleton while loading */}
         {!imageLoaded && !imageError && (
@@ -60,8 +60,8 @@ export default function GameCard({
           />
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-b from-[#181922] to-[#0E0F14] text-white/30 p-4 text-center">
-            <Gamepad2 className="w-8 h-8 mb-2 stroke-[1.2] text-white/20 group-hover:text-white/40 transition-colors" />
-            <span className="text-[11px] font-medium tracking-wider uppercase text-white/40">No Artwork</span>
+            <Gamepad2 className="w-10 h-10 mb-2 stroke-[1.2] text-white/20 group-hover:text-white/40 transition-colors" />
+            <span className="text-xs font-medium tracking-wider uppercase text-white/40">No Artwork</span>
           </div>
         )}
 
@@ -70,25 +70,25 @@ export default function GameCard({
 
         {/* Top Badges (Rating / Community Score) */}
         {rating !== undefined && rating !== null && (
-          <div className="absolute top-2.5 right-2.5 flex items-center gap-1 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md border border-white/15 text-[11px] font-bold text-white shadow-lg">
-            <Star className="w-3 h-3 text-[#E50914] fill-[#E50914]" />
+          <div className="absolute top-3 right-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/70 backdrop-blur-md border border-white/20 text-xs font-bold text-white shadow-lg whitespace-nowrap">
+            <Star className="w-3.5 h-3.5 text-[#E50914] fill-[#E50914]" />
             <span>{rating.toFixed(1)}</span>
           </div>
         )}
 
         {/* Hover Action Overlay with Minimalist Platform Icons */}
-        <div className="absolute inset-0 flex flex-col justify-end p-3.5 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 pointer-events-none">
+        <div className="absolute inset-0 flex flex-col justify-end p-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 pointer-events-none">
           {platforms.length > 0 && (
-            <div className="mb-2">
+            <div className="mb-2.5">
               <PlatformIconList
                 platforms={platforms}
                 max={4}
-                className="flex items-center gap-2 px-2 py-1 rounded-md bg-black/60 backdrop-blur-md border border-white/15 w-fit text-white"
+                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-black/70 backdrop-blur-md border border-white/20 text-white"
               />
             </div>
           )}
 
-          <p className="text-xs font-bold text-white drop-shadow-md truncate flex items-center gap-1">
+          <p className="text-xs font-bold text-white drop-shadow-md truncate flex items-center gap-1.5">
             <span>View Details</span>
             <span className="text-[#E50914]">→</span>
           </p>
@@ -96,16 +96,16 @@ export default function GameCard({
       </div>
 
       {/* Title & Metadata (Underneath card with Minimalist Platform Icons) */}
-      <div className="mt-2.5 px-0.5">
-        <h3 className="text-xs sm:text-sm font-semibold text-white/95 group-hover:text-white truncate transition-colors tracking-tight">
+      <div className="mt-3 px-1">
+        <h3 className="text-sm sm:text-base font-semibold text-white/95 group-hover:text-white truncate transition-colors tracking-tight">
           {title}
         </h3>
-        <div className="flex items-center justify-between gap-2 mt-1 text-[11px] text-white/45">
+        <div className="flex items-center justify-between gap-2 mt-1.5 text-xs text-white/50">
           <span>{year || '—'}</span>
           <PlatformIconList
             platforms={platforms}
             max={3}
-            className="flex items-center gap-1.5 text-white/40 group-hover:text-white/80 transition-colors"
+            className="flex items-center gap-2 text-white/45 group-hover:text-white/85 transition-colors"
           />
         </div>
       </div>

@@ -130,13 +130,13 @@ export default function GameDetail({ user }: GameDetailProps) {
 
   if (loading) {
     return (
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12">
-        <div className="flex flex-col md:flex-row gap-8">
-          <div className="w-56 sm:w-64 aspect-[2/3] apple-skeleton rounded-2xl flex-shrink-0 mx-auto md:mx-0" />
-          <div className="flex-1 space-y-4">
-            <div className="h-10 w-3/4 apple-skeleton rounded-xl" />
-            <div className="h-5 w-1/3 apple-skeleton rounded-lg" />
-            <div className="h-24 w-full apple-skeleton rounded-xl" />
+      <div className="max-w-[1500px] mx-auto px-6 sm:px-10 lg:px-16 py-16">
+        <div className="flex flex-col md:flex-row gap-12">
+          <div className="w-64 sm:w-72 aspect-[2/3] apple-skeleton rounded-3xl flex-shrink-0 mx-auto md:mx-0" />
+          <div className="flex-1 space-y-5">
+            <div className="h-12 w-3/4 apple-skeleton rounded-2xl" />
+            <div className="h-6 w-1/3 apple-skeleton rounded-xl" />
+            <div className="h-28 w-full apple-skeleton rounded-2xl" />
           </div>
         </div>
       </div>
@@ -145,13 +145,13 @@ export default function GameDetail({ user }: GameDetailProps) {
 
   if (!game) {
     return (
-      <div className="max-w-4xl mx-auto px-4 py-24 text-center">
-        <AlertCircle className="w-12 h-12 text-white/30 mx-auto mb-4" />
-        <h2 className="text-xl font-bold text-white mb-2">Game Not Found</h2>
-        <p className="text-sm text-white/50 mb-6">We couldn't retrieve the details for this title.</p>
+      <div className="max-w-4xl mx-auto px-6 py-28 text-center">
+        <AlertCircle className="w-14 h-14 text-white/30 mx-auto mb-4" />
+        <h2 className="text-2xl font-bold text-white mb-2">Game Not Found</h2>
+        <p className="text-sm text-white/50 mb-8">We couldn't retrieve the details for this title.</p>
         <Link
           to="/"
-          className="px-5 py-2.5 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-semibold tracking-wide transition-all"
+          className="inline-flex items-center justify-center px-6 py-3 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-semibold tracking-wide transition-all"
         >
           Return Home
         </Link>
@@ -164,11 +164,11 @@ export default function GameDetail({ user }: GameDetailProps) {
     : null;
 
   return (
-    <div className="relative min-h-screen pb-24">
+    <div className="relative min-h-screen pb-32">
       {/* ========================================================= */}
       {/* 1. CINEMATIC FULL-BLEED BACKDROP                          */}
       {/* ========================================================= */}
-      <div className="absolute top-0 left-0 right-0 h-[520px] overflow-hidden pointer-events-none -z-0">
+      <div className="absolute top-0 left-0 right-0 h-[600px] overflow-hidden pointer-events-none -z-0">
         {game.background_url ? (
           <img
             src={game.background_url}
@@ -190,11 +190,11 @@ export default function GameDetail({ user }: GameDetailProps) {
       {/* ========================================================= */}
       {/* 2. GAME DETAIL HERO                                       */}
       {/* ========================================================= */}
-      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 pt-10 sm:pt-16">
-        <div className="flex flex-col md:flex-row gap-8 lg:gap-12">
+      <div className="relative z-10 max-w-[1500px] mx-auto px-6 sm:px-10 lg:px-16 pt-12 sm:pt-20">
+        <div className="flex flex-col md:flex-row gap-10 lg:gap-14 items-start md:items-end">
           {/* Floating Poster Card */}
-          <div className="w-52 sm:w-64 flex-shrink-0 mx-auto md:mx-0">
-            <div className="aspect-[2/3] rounded-2xl overflow-hidden bg-[#121319] border border-white/20 shadow-[0_24px_50px_rgba(0,0,0,0.9)] relative group">
+          <div className="w-60 sm:w-72 md:w-80 flex-shrink-0 mx-auto md:mx-0">
+            <div className="aspect-[2/3] rounded-3xl overflow-hidden bg-[#121319] border border-white/20 shadow-[0_30px_70px_rgba(0,0,0,0.95)] relative group">
               {game.cover_url ? (
                 <img
                   src={game.cover_url}
@@ -202,44 +202,44 @@ export default function GameDetail({ user }: GameDetailProps) {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <div className="w-full h-full flex flex-col items-center justify-center text-white/30 p-4">
-                  <Gamepad2 className="w-10 h-10 mb-2 stroke-[1.2]" />
-                  <span className="text-xs uppercase tracking-wider">No Cover</span>
+                <div className="w-full h-full flex flex-col items-center justify-center text-white/30 p-6 text-center">
+                  <Gamepad2 className="w-12 h-12 mb-3 stroke-[1.2]" />
+                  <span className="text-xs uppercase tracking-wider font-semibold">No Cover</span>
                 </div>
               )}
             </div>
           </div>
 
           {/* Title & Metadata */}
-          <div className="flex-1 flex flex-col justify-end">
-            {/* Badges */}
-            <div className="flex items-center gap-2 flex-wrap mb-3">
+          <div className="flex-1 flex flex-col justify-end w-full">
+            {/* Badges - Breathable Pills */}
+            <div className="flex items-center gap-3 flex-wrap mb-4">
               {releaseYear && (
-                <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-white/10 backdrop-blur-md text-white/90 border border-white/10">
+                <span className="inline-flex items-center justify-center px-4 py-1.5 rounded-full text-xs font-semibold bg-white/10 backdrop-blur-md text-white border border-white/15 whitespace-nowrap">
                   {releaseYear}
                 </span>
               )}
               {game.developer && (
-                <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-white/10 backdrop-blur-md text-white/80 border border-white/10">
+                <span className="inline-flex items-center justify-center px-4 py-1.5 rounded-full text-xs font-semibold bg-white/10 backdrop-blur-md text-white/90 border border-white/15 whitespace-nowrap">
                   {game.developer}
                 </span>
               )}
             </div>
 
             {/* Title */}
-            <h1 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight leading-tight mb-4 drop-shadow-md">
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight mb-5 drop-shadow-xl">
               {game.title}
             </h1>
 
-            {/* Platforms with Minimalist Icons */}
+            {/* Platforms with Minimalist Vector Icons */}
             {game.platforms.length > 0 && (
-              <div className="flex flex-wrap items-center gap-2 mb-5">
+              <div className="flex flex-wrap items-center gap-2.5 mb-6">
                 {game.platforms.map((p) => (
                   <span
                     key={p}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-white/[0.07] border border-white/[0.1] text-white/85 backdrop-blur-md hover:bg-white/[0.12] transition-colors"
+                    className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-medium bg-white/[0.08] border border-white/15 text-white/90 backdrop-blur-md hover:bg-white/[0.14] transition-colors whitespace-nowrap"
                   >
-                    <PlatformIcon platform={p} className="w-3.5 h-3.5 text-white/70" />
+                    <PlatformIcon platform={p} className="w-3.5 h-3.5 text-white/80" />
                     <span>{getPlatformFamilyName(p)}</span>
                   </span>
                 ))}
@@ -247,22 +247,22 @@ export default function GameDetail({ user }: GameDetailProps) {
             )}
 
             {/* Community Rating Pill */}
-            <div className="flex items-center gap-4 py-3 px-4 rounded-2xl apple-glass w-fit mb-6 border border-white/10">
-              <div className="flex items-center gap-2">
-                <StarRating value={stats?.avg_rating ?? null} readonly size={18} />
-                <span className="text-base font-bold text-white">
+            <div className="inline-flex items-center gap-4 py-3.5 px-5 rounded-2xl apple-glass w-fit mb-6 border border-white/15 shadow-lg">
+              <div className="flex items-center gap-2.5">
+                <StarRating value={stats?.avg_rating ?? null} readonly size={20} />
+                <span className="text-lg font-bold text-white">
                   {stats?.avg_rating ? stats.avg_rating.toFixed(2) : '—'}
                 </span>
               </div>
-              <div className="h-4 w-px bg-white/15" />
-              <div className="text-xs text-white/50">
+              <div className="h-5 w-px bg-white/15" />
+              <div className="text-xs text-white/60">
                 <strong className="text-white font-semibold">{stats?.total_ratings || 0}</strong> {stats?.total_ratings === 1 ? 'rating' : 'ratings'}
               </div>
               {stats?.total_favorites ? (
                 <>
-                  <div className="h-4 w-px bg-white/15" />
-                  <div className="flex items-center gap-1.5 text-xs text-[#E50914] font-medium">
-                    <Heart className="w-3.5 h-3.5 fill-[#E50914]" />
+                  <div className="h-5 w-px bg-white/15" />
+                  <div className="flex items-center gap-1.5 text-xs text-[#E50914] font-semibold">
+                    <Heart className="w-4 h-4 fill-[#E50914]" />
                     <span>{stats.total_favorites}</span>
                   </div>
                 </>
@@ -271,7 +271,7 @@ export default function GameDetail({ user }: GameDetailProps) {
 
             {/* Genres */}
             {game.genres.length > 0 && (
-              <div className="flex flex-wrap gap-2 text-xs text-white/60">
+              <div className="flex flex-wrap gap-2.5 text-xs text-white/60">
                 {game.genres.map((g) => (
                   <span key={g} className="hover:text-white transition-colors">
                     #{g}
@@ -285,75 +285,73 @@ export default function GameDetail({ user }: GameDetailProps) {
         {/* ========================================================= */}
         {/* 3. YOUR DIARY LOGGING STAGE (RATE / LOVE / REVIEW)        */}
         {/* ========================================================= */}
-        <section className="mt-10 p-6 sm:p-8 rounded-3xl apple-glass border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.6)]">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-white/[0.08]">
+        <section className="mt-12 p-8 sm:p-10 rounded-3xl apple-glass border border-white/15 shadow-[0_20px_50px_rgba(0,0,0,0.7)]">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-8 pb-8 border-b border-white/[0.08]">
             {/* Rating Section */}
             <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-white/40 mb-2">
+              <p className="text-xs font-bold uppercase tracking-wider text-white/40 mb-3">
                 Your Rating
               </p>
               <div className="flex items-center gap-3">
                 <StarRating
                   value={status?.rating ?? null}
                   onChange={handleRate}
-                  size={28}
+                  size={32}
                   showValue
                 />
               </div>
             </div>
 
             {/* Love Button Section */}
-            <div className="flex items-center gap-3">
-              <div>
-                <p className="text-xs font-bold uppercase tracking-wider text-white/40 mb-2">
-                  Favorite
-                </p>
-                <LoveButton
-                  loved={status?.is_favorite ?? false}
-                  onClick={handleLove}
-                  size={20}
-                  showLabel
-                  variant="pill"
-                />
-              </div>
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wider text-white/40 mb-3">
+                Favorite
+              </p>
+              <LoveButton
+                loved={status?.is_favorite ?? false}
+                onClick={handleLove}
+                size={22}
+                showLabel
+                variant="pill"
+              />
             </div>
           </div>
 
           {/* Review Box */}
-          <div className="mt-6">
-            <p className="text-xs font-bold uppercase tracking-wider text-white/40 mb-3 flex items-center justify-between">
-              <span>Your Review & Thoughts</span>
+          <div className="mt-8">
+            <p className="text-xs font-bold uppercase tracking-wider text-white/40 mb-4 flex items-center justify-between">
+              <span>Your Review & Verdict</span>
               {status?.review && !isEditingReview && (
-                <span className="text-emerald-400 font-medium normal-case text-[11px] flex items-center gap-1">
+                <span className="text-emerald-400 font-semibold normal-case text-xs flex items-center gap-1.5">
                   ✓ Review logged to diary
                 </span>
               )}
             </p>
 
             {status?.review && !isEditingReview ? (
-              <div className="p-4 rounded-2xl bg-white/[0.04] border border-white/[0.08]">
-                <p className="text-sm text-white/90 leading-relaxed whitespace-pre-wrap">
+              <div className="p-6 rounded-2xl bg-white/[0.04] border border-white/[0.08]">
+                <p className="text-sm text-white/90 leading-relaxed whitespace-pre-wrap font-normal">
                   {status.review.body}
                 </p>
-                <div className="flex items-center gap-3 mt-3 pt-3 border-t border-white/[0.06]">
+                <div className="flex items-center gap-4 mt-4 pt-4 border-t border-white/[0.06]">
                   <button
                     onClick={() => setIsEditingReview(true)}
-                    className="text-xs font-semibold text-white/60 hover:text-white flex items-center gap-1.5 transition-colors"
+                    className="text-xs font-semibold text-white/70 hover:text-white flex items-center gap-1.5 transition-colors cursor-pointer"
                   >
-                    <Edit3 className="w-3.5 h-3.5" />
+                    <Edit3 className="w-4 h-4" />
                     <span>Edit Review</span>
                   </button>
                   <button
                     onClick={handleDeleteReview}
-                    className="text-xs font-semibold text-white/40 hover:text-[#E50914] flex items-center gap-1.5 transition-colors"
+                    className="text-xs font-semibold text-white/40 hover:text-[#E50914] flex items-center gap-1.5 transition-colors cursor-pointer"
                   >
-                    <Trash2 className="w-3.5 h-3.5" />
+                    <Trash2 className="w-4 h-4" />
                     <span>Delete</span>
                   </button>
                 </div>
               </div>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-4">
                 <textarea
                   value={reviewText}
                   onChange={(e) => setReviewText(e.target.value)}
@@ -362,24 +360,24 @@ export default function GameDetail({ user }: GameDetailProps) {
                       ? "Write a review... What made this game special or memorable?"
                       : "Log in to write a review for this game..."
                   }
-                  rows={3}
+                  rows={4}
                   maxLength={5000}
                   disabled={!user}
-                  className="w-full p-4 rounded-2xl bg-black/40 border border-white/10 text-white placeholder:text-white/30 text-sm outline-none focus:border-white/30 transition-all resize-none font-normal"
+                  className="w-full p-5 rounded-2xl bg-black/40 border border-white/15 text-white placeholder:text-white/35 text-sm outline-none focus:border-white/35 transition-all resize-none font-normal"
                 />
 
-                <div className="flex items-center justify-between flex-wrap gap-3">
-                  <label className="flex items-center gap-2 text-xs text-white/60 select-none cursor-pointer">
+                <div className="flex items-center justify-between flex-wrap gap-4">
+                  <label className="flex items-center gap-2.5 text-xs text-white/70 select-none cursor-pointer">
                     <input
                       type="checkbox"
                       checked={spoilers}
                       onChange={(e) => setSpoilers(e.target.checked)}
-                      className="accent-[#E50914] rounded cursor-pointer"
+                      className="accent-[#E50914] rounded cursor-pointer w-4 h-4"
                     />
                     <span>Contains Spoilers</span>
                   </label>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-3">
                     {isEditingReview && (
                       <button
                         onClick={() => {
@@ -387,7 +385,7 @@ export default function GameDetail({ user }: GameDetailProps) {
                           setReviewText(status?.review?.body || '');
                           setSpoilers(status?.review?.contains_spoilers || false);
                         }}
-                        className="px-4 py-2 text-xs font-semibold text-white/60 hover:text-white transition-colors"
+                        className="px-5 py-2.5 text-xs font-semibold text-white/60 hover:text-white transition-colors cursor-pointer"
                       >
                         Cancel
                       </button>
@@ -396,7 +394,7 @@ export default function GameDetail({ user }: GameDetailProps) {
                     <button
                       onClick={user ? handleSubmitReview : () => navigate('/login')}
                       disabled={Boolean(user && (!reviewText.trim() || submittingReview))}
-                      className="px-6 py-2 rounded-full text-xs font-semibold bg-white text-black hover:bg-white/90 shadow-[0_4px_20px_rgba(255,255,255,0.15)] disabled:opacity-40 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                      className="inline-flex items-center justify-center px-8 py-3 rounded-full text-xs font-bold bg-white text-black hover:bg-white/90 shadow-[0_4px_25px_rgba(255,255,255,0.2)] disabled:opacity-40 transition-all hover:scale-[1.02] active:scale-[0.98] whitespace-nowrap cursor-pointer"
                     >
                       {submittingReview
                         ? 'Publishing...'
@@ -417,12 +415,12 @@ export default function GameDetail({ user }: GameDetailProps) {
         {/* 4. ABOUT & OVERVIEW                                       */}
         {/* ========================================================= */}
         {game.description && (
-          <section className="mt-12">
-            <h2 className="text-lg font-bold tracking-tight text-white mb-3">
+          <section className="mt-14">
+            <h2 className="text-xl font-bold tracking-tight text-white mb-4">
               About the Game
             </h2>
-            <div className="p-6 rounded-2xl apple-glass-subtle border border-white/[0.06]">
-              <p className="text-sm text-white/80 leading-relaxed whitespace-pre-line font-normal">
+            <div className="p-8 rounded-3xl apple-glass-subtle border border-white/[0.08]">
+              <p className="text-sm text-white/85 leading-relaxed whitespace-pre-line font-normal">
                 {game.description}
               </p>
             </div>
@@ -432,25 +430,25 @@ export default function GameDetail({ user }: GameDetailProps) {
         {/* ========================================================= */}
         {/* 5. COMMUNITY REVIEWS DIARY                                */}
         {/* ========================================================= */}
-        <section className="mt-12">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold tracking-tight text-white flex items-center gap-2">
+        <section className="mt-14">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-bold tracking-tight text-white flex items-center gap-2.5">
               <span>Community Reviews</span>
-              <span className="text-xs font-normal text-white/40">({reviews.length})</span>
+              <span className="text-sm font-normal text-white/40">({reviews.length})</span>
             </h2>
           </div>
 
           {reviews.length > 0 ? (
-            <div className="space-y-3">
+            <div className="space-y-4">
               {reviews.map((rev) => (
                 <ReviewCard key={rev.id} review={rev} />
               ))}
             </div>
           ) : (
-            <div className="p-10 rounded-2xl apple-glass-subtle border border-white/[0.06] text-center">
-              <MessageSquarePlus className="w-8 h-8 text-white/20 mx-auto mb-2" />
-              <p className="text-sm font-medium text-white/60">No reviews yet.</p>
-              <p className="text-xs text-white/35 mt-1">Be the first to share your thoughts on this game.</p>
+            <div className="p-12 rounded-3xl apple-glass-subtle border border-white/[0.08] text-center max-w-xl mx-auto">
+              <MessageSquarePlus className="w-10 h-10 text-white/20 mx-auto mb-3" />
+              <p className="text-base font-semibold text-white/80">No reviews yet.</p>
+              <p className="text-xs text-white/40 mt-1">Be the first to share your thoughts on this game.</p>
             </div>
           )}
         </section>

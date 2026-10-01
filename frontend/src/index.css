@@ -33,24 +33,40 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  width: 100%;
 }
 
 body {
   min-height: 100vh;
+  width: 100%;
   background-color: #070709;
   color: #FFFFFF;
+  overflow-x: hidden;
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Guaranteed Horizontal Centering */
+.mx-auto {
+  margin-left: auto !important;
+  margin-right: auto !important;
 }
 
 /* Apple TV / Glassmorphism surface */
 .apple-glass {
-  background: rgba(14, 15, 20, 0.72);
+  background: rgba(14, 15, 20, 0.78);
   backdrop-filter: blur(28px) saturate(190%);
   -webkit-backdrop-filter: blur(28px) saturate(190%);
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .apple-glass-subtle {
-  background: rgba(18, 19, 26, 0.45);
+  background: rgba(18, 19, 26, 0.50);
   backdrop-filter: blur(20px) saturate(160%);
   -webkit-backdrop-filter: blur(20px) saturate(160%);
   border: 1px solid rgba(255, 255, 255, 0.06);
@@ -61,6 +77,19 @@ body {
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* Apple-style breathable pill badge */
+.apple-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  line-height: 1;
+  padding: 0.35rem 0.85rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
 }
 
 /* Poster Card Spring Hover (Apple TV style) */
