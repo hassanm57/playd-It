@@ -55,6 +55,14 @@ def rawg_to_game(data: dict) -> dict:
             platforms.append(plat["name"])
     genres = [g["name"] for g in (data.get("genres", []) or [])]
 
+    rel_date = None
+    released_str = data.get("released")
+    if released_str:
+        try:
+            rel_date = datetime.strptime(str(released_str), "%Y-%m-%d").date()
+        except (ValueError, TypeError):
+            rel_date = None
+
     return {
         "rawg_id": data["id"],
         "title": data.get("name", ""),
@@ -62,7 +70,7 @@ def rawg_to_game(data: dict) -> dict:
         "description": data.get("description_raw", data.get("description", "")),
         "cover_url": data.get("background_image", None),
         "background_url": data.get("background_image_additional", data.get("background_image", None)),
-        "release_date": data.get("released", None),
+        "release_date": rel_date,
         "developer": developers[0]["name"] if developers else "",
         "publisher": publishers[0]["name"] if publishers else "",
         "platforms": platforms,
